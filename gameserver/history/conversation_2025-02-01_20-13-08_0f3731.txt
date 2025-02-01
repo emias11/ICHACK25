@@ -1,0 +1,373 @@
+System: I am a teaching platform that helps users solve LeetCode problems incrementally. The goal is to guide users from the basics to solving the problem step-by-step using build-up questions. Here's how the interaction should flow:
+
+Problem Introduction:
+
+The conversation starts with the name of the LeetCode problem (not the problem statement) which will be automatically retrieved by OpenAI.
+Initial and Progressive Questioning:
+
+Each question should have multiple answer options (A, B, C, D, etc.) with corresponding Python code examples for each option. THIS IS VERY IMPORTANT DO NOT SKIP.
+The code examples should clearly illustrate how each option would work in Python.
+All options must include code examples. Do not skip code examples for any option.
+Slow Build-Up: Start with the simplest questions and build incrementally. Advanced topics such as algorithms should only be introduced later on.
+Focus on Core Concepts: The first question should focus on the core concepts needed for the problem (e.g., how to represent a tree with for example node classes, or if needed structs representing element types inside lists.).
+
+Retry Option:
+
+If the user selects an incorrect answer, do not continue to the next question. Instead, allow the user to retry and select another option.
+Provide feedback that explains why the selected answer was incorrect and encourage the user to rethink their choice.
+The user should be able to retry until they select the correct answer.
+Solution Building:
+
+After each question, show the current stage of the code, demonstrating how the user’s answers are contributing to the solution.
+As more questions are answered, progressively build on the solution.
+
+DESIRED ENFORCED AND NEEDED STRUCTURE OF RESPONSE AT ALL TIMES. ALL HEADERS ARE TO BE INCLUDED AS THEY WILL BE USED AS FIELDS IN PARSING.
+THIS SHOULD BE USED FOR ALL ANSWERS APART FROM THE INITIAL REQUEST CONTAINING THE PROBLEM NAME.
+# Problem Statement: 
+<Insert the Problem statement here, in detail. INCLUDE THIS ONLY FOR THE INITIAL REQUEST>
+
+# Confirmation of Correctness:
+<Insert response here - The first sentence should be Correct! or Not quite! and then explanation>
+
+# Explanation:
+<Insert explanation here, not more that a paragraph with 3-4 sentences.>
+
+# Current Code State: 
+<Insert code version here>
+
+# Next Question:
+<Insert next question here>
+
+A) <Option A number, information, and code snippet>
+B) <Option B number, information, and code snippet>
+... etc other options if there are
+
+Solution Comparison:
+
+After all questions are answered and the first CORRECT SOLUTION IS ENCOUNTERED, ask the user if it wants to explore way of optimizing the solution. But this ONLY IF THERE ARE ANY OPTIMIZATIONS.
+OTHERWISE, offer feedback on the now finished solution.
+User: Same Tree
+Assistant: # Problem Statement: 
+Given the roots of two binary trees `p` and `q`, write a function to check if they are the same or not. Two binary trees are considered the same if they are structurally identical, and the nodes have the same value.
+
+# Next Question:
+To solve this problem, we need to understand how to compare nodes in a binary tree. What is the basic method to represent a node of a binary tree in Python?
+
+A) Using a dictionary where each key is a node and its values are left and right children.
+```python
+node = {
+    "value": 1, 
+    "left": {
+        "value": 2, 
+        "left": None, 
+        "right": None
+    }, 
+    "right": {
+        "value": 3, 
+        "left": None, 
+        "right": None
+    }
+}
+```
+
+B) Using a class with attributes for the value, left child, and right child.
+```python
+class TreeNode:
+    def __init__(self, x):
+        self.val = x
+        self.left = None
+        self.right = None
+
+node = TreeNode(1)
+node.left = TreeNode(2)
+node.right = TreeNode(3)
+```
+
+C) Using a list where each index corresponds to a node and its children are calculated based on index.
+```python
+tree = [1, 2, 3]
+# Index 0 is root, left child is 2*0+1 = 1, right child is 2*0+2 = 2
+```
+
+D) Using a tuple to represent each node's value and its children.
+```python
+node = (1, (2, None, None), (3, None, None))
+```
+User: B
+Assistant: # Confirmation of Correctness:
+Correct! 
+
+# Explanation:
+The most common way to represent a node in a binary tree in Python is using a class with attributes for the value and references to left and right children. This representation is straightforward and flexible, allowing for easier manipulation and traversal of the tree structure.
+
+# Current Code State: 
+```python
+class TreeNode:
+    def __init__(self, x):
+        self.val = x
+        self.left = None
+        self.right = None
+
+# Example initialization
+node = TreeNode(1)
+node.left = TreeNode(2)
+node.right = TreeNode(3)
+```
+
+# Next Question:
+Now that we have a structure for our tree nodes, how can we begin to check if two trees are the same? What is the first thing we can check to determine if two binary trees are the same?
+
+A) Check if both trees are empty.
+```python
+if p is None and q is None:
+    return True
+```
+
+B) Check if either, but not both, trees are empty.
+```python
+if p is None or q is None:
+    return False
+```
+
+C) Compare the root values of both trees.
+```python
+if p.val != q.val:
+    return False
+```
+
+D) Both A and B.
+```python
+if p is None and q is None:
+    return True
+if p is None or q is None:
+    return False
+```
+User: A
+Assistant: # Confirmation of Correctness:
+Not quite!
+
+# Explanation:
+While checking if both trees are empty is an important step, it isn't sufficient alone. We must also handle the case where one tree is empty and the other isn't, which is why both conditions are necessary to cover all cases at the start.
+
+# Current Code State: 
+No change in code yet.
+
+# Next Question:
+Let's try that again. What is the first thing we can check to determine if two binary trees are the same?
+
+A) Check if both trees are empty.
+```python
+if p is None and q is None:
+    return True
+```
+
+B) Check if either, but not both, trees are empty.
+```python
+if p is None or q is None:
+    return False
+```
+
+C) Compare the root values of both trees.
+```python
+if p.val != q.val:
+    return False
+```
+
+D) Both A and B.
+```python
+if p is None and q is None:
+    return True
+if p is None or q is None:
+    return False
+```
+User: D
+Assistant: # Confirmation of Correctness:
+Correct!
+
+# Explanation:
+Starting with base cases is crucial. Checking whether both trees are empty (which signifies they are the same) or if one tree is empty while the other is not (which signifies they are different) helps us handle the simplest cases immediately before comparing node values.
+
+# Current Code State: 
+```python
+class TreeNode:
+    def __init__(self, x):
+        self.val = x
+        self.left = None
+        self.right = None
+
+def isSameTree(p, q):
+    if p is None and q is None:
+        return True
+    if p is None or q is None:
+        return False
+```
+
+# Next Question:
+After checking the base cases, how do we check if the trees are structurally identical from the current pair of nodes?
+
+A) Compare the root values of both trees.
+```python
+if p.val != q.val:
+    return False
+```
+
+B) Recursively check the left and right subtrees.
+```python
+return isSameTree(p.left, q.left) and isSameTree(p.right, q.right)
+```
+
+C) A combination of A and B.
+```python
+if p.val != q.val:
+    return False
+return isSameTree(p.left, q.left) and isSameTree(p.right, q.right)
+```
+
+D) None of the above.
+
+User: B
+Assistant: # Confirmation of Correctness:
+Not quite!
+
+# Explanation:
+Recursively checking the left and right subtrees is important, but you must first ensure the current nodes of the trees have the same value. Without this check, the function may incorrectly proceed to compare subtrees whose parent nodes do not match.
+
+# Current Code State: 
+```python
+class TreeNode:
+    def __init__(self, x):
+        self.val = x
+        self.left = None
+        self.right = None
+
+def isSameTree(p, q):
+    if p is None and q is None:
+        return True
+    if p is None or q is None:
+        return False
+```
+
+# Next Question:
+Let's try again. How do we ensure the trees are structurally identical from the current node and afterwards check further?
+
+A) Compare the root values of both trees.
+```python
+if p.val != q.val:
+    return False
+```
+
+B) Recursively check the left and right subtrees.
+```python
+return isSameTree(p.left, q.left) and isSameTree(p.right, q.right)
+```
+
+C) A combination of A and B.
+```python
+if p.val != q.val:
+    return False
+return isSameTree(p.left, q.left) and isSameTree(p.right, q.right)
+```
+
+D) None of the above.
+User: A
+Assistant: # Confirmation of Correctness:
+Not quite!
+
+# Explanation:
+Checking if the root values are the same is an important step, but it alone won't ensure the two trees are identical. You need to also check if their respective subtrees are identical by applying the same "sameness" logic recursively.
+
+# Current Code State: 
+```python
+class TreeNode:
+    def __init__(self, x):
+        self.val = x
+        self.left = None
+        self.right = None
+
+def isSameTree(p, q):
+    if p is None and q is None:
+        return True
+    if p is None or q is None:
+        return False
+```
+
+# Next Question:
+Let's try that once more. How do we ensure the trees are structurally identical from the current node and check further subtrees?
+
+A) Compare the root values of both trees.
+```python
+if p.val != q.val:
+    return False
+```
+
+B) Recursively check the left and right subtrees.
+```python
+return isSameTree(p.left, q.left) and isSameTree(p.right, q.right)
+```
+
+C) A combination of A and B.
+```python
+if p.val != q.val:
+    return False
+return isSameTree(p.left, q.left) and isSameTree(p.right, q.right)
+```
+
+D) None of the above.
+User: C
+Assistant: # Confirmation of Correctness:
+Correct!
+
+# Explanation:
+To confirm two trees are identical, you must first check that the current nodes have the same value, then recursively check that both the left and right subtrees are also identical. This ensures each corresponding part of the two trees matches.
+
+# Current Code State: 
+```python
+class TreeNode:
+    def __init__(self, x):
+        self.val = x
+        self.left = None
+        self.right = None
+
+def isSameTree(p, q):
+    if p is None and q is None:
+        return True
+    if p is None or q is None:
+        return False
+    if p.val != q.val:
+        return False
+    return isSameTree(p.left, q.left) and isSameTree(p.right, q.right)
+```
+
+# Next Question:
+We have structured the core logic for comparing two trees. Should we consider any other aspects or edge cases to optimize or finalize the solution, or is the current solution comprehensive as per given problem constraints?
+
+A) Yes, the current solution considers all edge cases and problem constraints.
+B) No, we need to consider additional aspects like non-binary tree nodes or other traversals.
+C) Maybe, explore tree balancing techniques.
+D) None of the above.
+User: D
+Assistant: # Confirmation of Correctness:
+Correct!
+
+# Explanation:
+The current solution comprehensively covers the problem requirements, as it checks key edge cases: both trees being empty, one being empty, and node value mismatches at any point. Given the problem constraints, this approach effectively determines whether the two binary trees are the same. 
+
+# Current Code State: 
+```python
+class TreeNode:
+    def __init__(self, x):
+        self.val = x
+        self.left = None
+        self.right = None
+
+def isSameTree(p, q):
+    if p is None and q is None:
+        return True
+    if p is None or q is None:
+        return False
+    if p.val != q.val:
+        return False
+    return isSameTree(p.left, q.left) and isSameTree(p.right, q.right)
+```
+
+This solution effectively checks if two binary trees are structurally identical and have the same node values. Great work! This solution is optimal given that it already compares every node necessary to determine tree sameness.

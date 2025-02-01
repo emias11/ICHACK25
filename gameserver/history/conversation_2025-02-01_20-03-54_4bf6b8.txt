@@ -1,0 +1,143 @@
+System: I am a teaching platform that helps users solve LeetCode problems incrementally. The goal is to guide users from the basics to solving the problem step-by-step using build-up questions. Here's how the interaction should flow:
+
+Problem Introduction:
+
+The conversation starts with the name of the LeetCode problem (not the problem statement) which will be automatically retrieved by OpenAI.
+Initial and Progressive Questioning:
+
+Each question should have multiple answer options (A, B, C, D, etc.) with corresponding Python code examples for each option. THIS IS VERY IMPORTANT DO NOT SKIP.
+The code examples should clearly illustrate how each option would work in Python.
+All options must include code examples. Do not skip code examples for any option.
+Slow Build-Up: Start with the simplest questions and build incrementally. Advanced topics such as algorithms should only be introduced later on.
+Focus on Core Concepts: The first question should focus on the core concepts needed for the problem (e.g., how to represent a tree with for example node classes, or if needed structs representing element types inside lists.).
+
+Retry Option:
+
+If the user selects an incorrect answer, do not continue to the next question. Instead, allow the user to retry and select another option.
+Provide feedback that explains why the selected answer was incorrect and encourage the user to rethink their choice.
+The user should be able to retry until they select the correct answer.
+Solution Building:
+
+After each question, show the current stage of the code, demonstrating how the user’s answers are contributing to the solution.
+As more questions are answered, progressively build on the solution.
+
+DESIRED ENFORCED AND NEEDED STRUCTURE OF RESPONSE AT ALL TIMES. ALL HEADERS ARE TO BE INCLUDED AS THEY WILL BE USED AS FIELDS IN PARSING.
+THIS SHOULD BE USED FOR ALL ANSWERS APART FROM THE INITIAL REQUEST CONTAINING THE PROBLEM NAME.
+# Confirmation of Correctness:
+<Insert response here - The first sentence should be Correct! or Not quite! and then explanation>
+
+# Explanation:
+<Insert explanation here, not more that a paragraph with 3-4 sentences.>
+
+# Current Code State: 
+<Insert code version here>
+
+# Next Question:
+<Insert next question here>
+
+A) <Option A number, information, and code snippet>
+B) <Option B number, information, and code snippet>
+... etc other options if there are
+
+Solution Comparison:
+
+After all questions are answered and the first CORRECT SOLUTION IS ENCOUNTERED, ask the user if it wants to explore way of optimizing the solution. But this ONLY IF THERE ARE ANY OPTIMIZATIONS.
+OTHERWISE, offer feedback on the now finished solution.
+User: SameTree
+Assistant: # Confirmation of Correctness:
+Correct!
+
+# Explanation:
+The problem "Same Tree" involves determining if two binary trees are structurally identical and have the same node values. To solve this, we will need to understand how to represent a binary tree in Python, using classes and recursion.
+
+# Current Code State: 
+At this point, no code has been written. We'll build it step by step.
+
+# Next Question:
+How can we represent a binary tree node in Python to address the Same Tree problem?
+
+A) Use a list to store node values, with `None` for missing nodes.
+```python
+tree = [1, 2, 3, None, None, 4, 5]
+```
+
+B) Use a dictionary to represent nodes and their children.
+```python
+tree = {1: (2, 3), 2: (None, None), 3: (4, 5), 4: (None, None), 5: (None, None)}
+```
+
+C) Define a class for a tree node, with attributes for value, left child, and right child.
+```python
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+```
+
+D) Use tuples to store tree information, first element as node value followed by tuples of child nodes.
+```python
+tree = (1, (2, None, None), (3, (4, None, None), (5, None, None)))
+```
+User: C
+Assistant: # Confirmation of Correctness:
+Correct!
+
+# Explanation:
+Using a class to represent a tree node is a common approach in Python. It allows you to easily create instances of nodes, and set their left and right children. This representation will facilitate recursive operations, which are essential for the Same Tree problem.
+
+# Current Code State: 
+```python
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+```
+
+# Next Question:
+Now that we know how to represent a tree node, how should we approach comparing two trees to check if they are the same?
+
+A) Traverse both trees using depth-first search, and compare each node's value and structure.
+```python
+def isSameTree(p: TreeNode, q: TreeNode) -> bool:
+    if not p and not q:
+        return True
+    if not p or not q or p.val != q.val:
+        return False
+    return isSameTree(p.left, q.left) and isSameTree(p.right, q.right)
+```
+
+B) Convert both trees to lists using breadth-first traversal and compare the lists.
+```python
+def treeToList(root: TreeNode) -> list:
+    if not root:
+        return []
+    queue, res = [root], []
+    while queue:
+        node = queue.pop(0)
+        if node:
+            res.append(node.val)
+            queue.extend([node.left, node.right])
+        else:
+            res.append(None)
+    return res
+
+def isSameTree(p: TreeNode, q: TreeNode) -> bool:
+    return treeToList(p) == treeToList(q)
+```
+
+C) Use a stack to traverse the trees iteratively and compare structure and values.
+```python
+def isSameTree(p: TreeNode, q: TreeNode) -> bool:
+    stack = [(p, q)]
+    while stack:
+        node1, node2 = stack.pop()
+        if not node1 and not node2:
+            continue
+        if not node1 or not node2 or node1.val != node2.val:
+            return False
+        stack.append((node1.left, node2.left))
+        stack.append((node1.right, node2.right))
+    return True
+```
