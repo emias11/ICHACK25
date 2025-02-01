@@ -1,9 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Check, X, Code } from 'lucide-react';
 import { problems } from '@/data/questions';
+
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+const customDarkTheme = {
+  ...dark,
+  'pre[class*="language-"]': {
+    ...dark['pre[class*="language-"]'],
+    backgroundColor: '#1e1e1e', // Set background to black
+    borderColor: '#1e1e1e',
+  },
+};
 
 const QuizApp = () => {
   const [answered, setAnswered] = useState({});
@@ -86,6 +97,20 @@ const QuizApp = () => {
     }, 1000);
   };
 
+  // Helper function for determining the background color of the code block
+  const getCodeBlockStyle = (questionId, option) => {
+    if (!answered[questionId]) return 'bg-gray-900';
+    const isCorrectAnswer = selectedAnswers[questionId] === questions.find(q => q.id === questionId).correctAnswer;
+    const isSelected = selectedAnswers[questionId] === option;
+    if (isSelected && isCorrectAnswer) {
+      return 'bg-[rgba(34,197,94,0.6)]'; // Green with 60% opacity
+    } 
+    if (isSelected && !isCorrectAnswer) {
+      return 'bg-[rgba(239,68,68,0.6)]'; // Red with 60% opacity
+    }
+    return 'bg-gray-900';
+  };
+
   const isCorrect = (questionId) => {
     const question = problems[currentProblemSet].find(q => q.id === questionId);
     return selectedAnswers[questionId] === question.correctAnswer;
@@ -96,7 +121,7 @@ const QuizApp = () => {
       <div className="max-w-4xl mx-auto p-4 space-y-6" {...handlers}>
         <div className="flex items-center justify-center gap-2 mb-6">
           <Code size={32} className="text-blue-400" />
-          <h1 className="text-3xl font-bold text-center text-blue-400">Cheetcode</h1>
+          <h1 className="text-3xl font-bold text-center text-blue-400">CheetCode</h1>
         </div>
         
         {problems[currentProblemSet].slice(0, currentQuestionIndex + 1).map((question, index) => (
@@ -111,77 +136,36 @@ const QuizApp = () => {
               </h2>
               
               <div className="flex flex-col md:flex-row gap-4 mb-6">
+                {/* Code Block A */}
                 <div className="flex-1">
-                  <div className="bg-gray-900 p-4 rounded-lg h-full">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Button
-                        onClick={() => handleAnswer(question.id, "Code A")}
-                        className={`w-full ${
-                          answered[question.id]
-                            ? "Code A" === question.correctAnswer
-                              ? 'bg-green-600 hover:bg-green-700'
-                              : selectedAnswers[question.id] === "Code A"
-                              ? 'bg-red-600 hover:bg-red-700'
-                              : 'bg-gray-700 hover:bg-gray-600'
-                            : 'bg-blue-600 hover:bg-blue-700'
-                        }`}
-                        disabled={answered[question.id]}
-                      >
-                        Option A
-                        {answered[question.id] && "Code A" === question.correctAnswer && (
-                          <Check className="ml-2" size={16} />
-                        )}
-                        {answered[question.id] && 
-                         "Code A" === selectedAnswers[question.id] && 
-                         !isCorrect(question.id) && (
-                          <X className="ml-2" size={16} />
-                        )}
-                      </Button>
-                    </div>
-                    <pre className="text-sm overflow-x-auto p-2 bg-gray-950 rounded h-full">
-                      <code className="text-gray-100">{question.codeA}</code>
-                    </pre>
+                  <div
+                    className={`bg-gray-900 p-4 rounded-lg h-full cursor-pointer ${getCodeBlockStyle(question.id, 'Code A')}`}
+                    onClick={() => handleAnswer(question.id, "Code A")}
+                  >
+                    <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
+                      {question.codeA}
+                    </SyntaxHighlighter>
                   </div>
                 </div>
 
+                {/* Code Block B */}
                 <div className="flex-1">
-                  <div className="bg-gray-900 p-4 rounded-lg h-full">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Button
-                        onClick={() => handleAnswer(question.id, "Code B")}
-                        className={`w-full ${
-                          answered[question.id]
-                            ? "Code B" === question.correctAnswer
-                              ? 'bg-green-600 hover:bg-green-700'
-                              : selectedAnswers[question.id] === "Code B"
-                              ? 'bg-red-600 hover:bg-red-700'
-                              : 'bg-gray-700 hover:bg-gray-600'
-                            : 'bg-blue-600 hover:bg-blue-700'
-                        }`}
-                        disabled={answered[question.id]}
-                      >
-                        Option B
-                        {answered[question.id] && "Code B" === question.correctAnswer && (
-                          <Check className="ml-2" size={16} />
-                        )}
-                        {answered[question.id] && 
-                         "Code B" === selectedAnswers[question.id] && 
-                         !isCorrect(question.id) && (
-                          <X className="ml-2" size={16} />
-                        )}
-                      </Button>
-                    </div>
-                    <pre className="text-sm overflow-x-auto p-2 bg-gray-950 rounded h-full">
-                      <code className="text-gray-100">{question.codeB}</code>
-                    </pre>
+                  <div
+                    className={`bg-gray-900 p-4 rounded-lg h-full cursor-pointer ${getCodeBlockStyle(question.id, 'Code B')}`}
+                    onClick={() => handleAnswer(question.id, "Code B")}
+                  >
+                    <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
+                      {question.codeB}
+                    </SyntaxHighlighter>
                   </div>
                 </div>
               </div>
               
+              {/* Explanation */}
               {answered[question.id] && (
                 <div className="mt-4 p-4 bg-gray-700 rounded-lg">
                   <p className="text-sm">
-                    {isCorrect(question.id) ? (
+                    {selectedAnswers[question.id] === question.correctAnswer ? (
                       <span className="text-green-400 font-semibold">Correct! </span>
                     ) : (
                       <span className="text-red-400 font-semibold">Incorrect. </span>
@@ -194,6 +178,7 @@ const QuizApp = () => {
           </Card>
         ))}
 
+        {/* Quiz Completion */}
         {currentQuestionIndex >= problems[currentProblemSet].length && (
           <Card className="bg-gray-800 border-gray-700">
             <CardContent className="p-6">
