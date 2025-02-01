@@ -60,7 +60,7 @@ def get_user_input():
 
 if __name__ == "__main__":
     
-    api_url = ""
+    api_url = "http://localhost:3001/"
     while True: 
         # 1. Get the question from /leetcode. E.g. Same Tree
         question = get_leetcode_question(api_url)
