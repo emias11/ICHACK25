@@ -157,7 +157,14 @@ const QuizApp = () => {
               className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getDivColour(question.id, "Code A")}`}
               onClick={() => handleAnswer(question.id, "Code A")}
             >
-              <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
+
+
+              <SyntaxHighlighter
+                language="python"
+                style={customDarkTheme}
+                className="text-gray-100"
+                customStyle={{ fontSize: '11.5px' }} // Change the font size here
+              >
                 {question.codeA}
               </SyntaxHighlighter>
             </div>
@@ -169,7 +176,7 @@ const QuizApp = () => {
               className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getDivColour(question.id, "Code B")}`}
               onClick={() => handleAnswer(question.id, "Code B")}
             >
-              <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
+              <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100" customStyle={{ fontSize: '11.5px' }}>
                 {question.codeB}
               </SyntaxHighlighter>
             </div>
@@ -181,7 +188,7 @@ const QuizApp = () => {
               className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getDivColour(question.id, "Code C")}`}
               onClick={() => handleAnswer(question.id, "Code C")}
             >
-              <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
+              <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100" customStyle={{ fontSize: '11.5px' }}>
                 {question.codeC}
               </SyntaxHighlighter>
             </div>
@@ -193,7 +200,7 @@ const QuizApp = () => {
               className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getDivColour(question.id, "Code D")}`}
               onClick={() => handleAnswer(question.id, "Code D")}
             >
-              <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
+              <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100" customStyle={{ fontSize: '11.5px' }}>
                 {question.codeD}
               </SyntaxHighlighter>
             </div>
