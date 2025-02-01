@@ -124,56 +124,57 @@ const QuizApp = () => {
                 {index + 1}. {question.question}
               </h2>
 
-              {/* Grid layout with 2 rows of 2 options */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                {/* Code Block A */}
-                <div className="flex justify-center">
-                  <div
-                    className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getDivColour(question.id, "Code A")}`}
-                    onClick={() => handleAnswer(question.id, "Code A")}
-                  >
-                    <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
-                      {question.codeA}
-                    </SyntaxHighlighter>
-                  </div>
-                </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
 
-                {/* Code Block B */}
-                <div className="flex justify-center">
-                  <div
-                    className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getDivColour(question.id, "Code B")}`}
-                    onClick={() => handleAnswer(question.id, "Code B")}
-                  >
-                    <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
-                      {question.codeB}
-                    </SyntaxHighlighter>
-                  </div>
-                </div>
+          
+          {/* Code Block A */}
+          <div className="flex justify-center">
+            <div
+              className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getDivColour(question.id, "Code A")}`}
+              onClick={() => handleAnswer(question.id, "Code A")}
+            >
+              <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
+                {question.codeA}
+              </SyntaxHighlighter>
+            </div>
+          </div>
 
-                {/* Code Block C (New Option) */}
-                <div className="flex justify-center">
-                  <div
-                    className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getDivColour(question.id, "Code C")}`}
-                    onClick={() => handleAnswer(question.id, "Code C")}
-                  >
-                    <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
-                      {question.codeC}
-                    </SyntaxHighlighter>
-                  </div>
-                </div>
+          {/* Code Block B */}
+          <div className="flex justify-center">
+            <div
+              className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getDivColour(question.id, "Code B")}`}
+              onClick={() => handleAnswer(question.id, "Code B")}
+            >
+              <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
+                {question.codeB}
+              </SyntaxHighlighter>
+            </div>
+          </div>
 
-                {/* Code Block D (New Option) */}
-                <div className="flex justify-center">
-                  <div
-                    className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getDivColour(question.id, "Code D")}`}
-                    onClick={() => handleAnswer(question.id, "Code D")}
-                  >
-                    <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
-                      {question.codeD}
-                    </SyntaxHighlighter>
-                  </div>
-                </div>
-              </div>
+          {/* Code Block C (New Option) */}
+          <div className="flex justify-center">
+            <div
+              className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getDivColour(question.id, "Code C")}`}
+              onClick={() => handleAnswer(question.id, "Code C")}
+            >
+              <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
+                {question.codeC}
+              </SyntaxHighlighter>
+            </div>
+          </div>
+
+          {/* Code Block D (New Option) */}
+          <div className="flex justify-center">
+            <div
+              className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getDivColour(question.id, "Code D")}`}
+              onClick={() => handleAnswer(question.id, "Code D")}
+            >
+              <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
+                {question.codeD}
+              </SyntaxHighlighter>
+            </div>
+          </div>
+        </div>
 
               {/* Explanation */}
               {answered[question.id] && (
