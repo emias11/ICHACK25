@@ -64,7 +64,7 @@ const QuizApp = () => {
         if (ref) observer.unobserve(ref);
       });
     };
-  }, [problems[currentProblemSet]]);
+  }, [problems[currentProblemSet].problem_questions]);
 
   const handleAnswer = (questionId, selectedOption) => {
     if (answered[questionId]) return;
@@ -93,7 +93,7 @@ const QuizApp = () => {
 
   const getDivColour = (questionId, option) => {
     if (!answered[questionId]) return ''; // No class if not answered
-    const isCorrectAnswer = selectedAnswers[questionId] === problems[currentProblemSet].find(q => q.id === questionId).correctAnswer;
+    const isCorrectAnswer = selectedAnswers[questionId] === problems[currentProblemSet].problem_questions.find(q => q.id === questionId).correctAnswer;
     const isSelected = selectedAnswers[questionId] === option;
 
     if (isSelected) {
@@ -112,8 +112,18 @@ const QuizApp = () => {
           <Code size={32} className="text-blue-400" />
           <h1 className="text-3xl font-bold text-center text-blue-400">CheetCode</h1>
         </div>
+        
+        {/* Problem Title */}
+        <h2 className="text-xl font-semibold text-center text-gray-100">
+          {problems[currentProblemSet].problem_title}
+        </h2>
+        
+        {/* Problem Description */}
+        <p className="text-center text-gray-400">
+          {problems[currentProblemSet].problem_description}
+        </p>
 
-        {problems[currentProblemSet].slice(0, currentQuestionIndex + 1).map((question, index) => (
+        {problems[currentProblemSet].problem_questions.slice(0, currentQuestionIndex + 1).map((question, index) => (
           <Card
             key={question.id}
             ref={el => questionRefs.current[question.id] = el}
@@ -194,7 +204,7 @@ const QuizApp = () => {
         ))}
 
         {/* Quiz Completion */}
-        {currentQuestionIndex >= problems[currentProblemSet].length && (
+        {currentQuestionIndex >= problems[currentProblemSet].problem_questions.length && (
           <Card className="bg-gray-800 border-gray-700">
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold text-center text-gray-100">
