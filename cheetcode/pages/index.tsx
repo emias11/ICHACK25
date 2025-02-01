@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useSwipeable } from 'react-swipeable';
 import { Card, CardContent } from '@/components/ui/card';
 import { Check, X, Code } from 'lucide-react';
+import { problems } from '@/data/questions';
 
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -14,71 +16,33 @@ const customDarkTheme = {
   },
 };
 
-const questions = [
-  {
-    id: 1,
-    question: "Which code implementation is more efficient for finding a number in a sorted array?",
-    codeA: `def find_number(arr, target):
-    for i in range(len(arr)):
-        if arr[i] == target:
-            return i
-    return -1`,
-    codeB: `def find_number(arr, target):
-    left, right = 0, len(arr) - 1
-    while left <= right:
-        mid = (left + right) // 2
-        if arr[mid] == target:
-            return mid
-        elif arr[mid] < target:
-            left = mid + 1
-        else:
-            right = mid - 1
-    return -1`,
-    correctAnswer: "Code B",
-    explanation: "Code B implements binary search with O(log n) complexity, while Code A uses linear search with O(n) complexity."
-  },
-  {
-    id: 2,
-    question: "Which implementation of checking for a palindrome string is correct?",
-    codeA: `def is_palindrome(s):
-    s = s.lower()
-    return s == s[::-1]`,
-    codeB: `def is_palindrome(s):
-    s = s.lower()
-    left, right = 0, len(s) - 1
-    while left < right:
-        if s[left] != s[right]:
-            return True
-        left += 1
-        right -= 1
-    return False`,
-    correctAnswer: "Code A",
-    explanation: "Code A correctly checks for palindromes by comparing the string with its reverse. Code B has a logic error in the return statements."
-  },
-  {
-    id: 3,
-    question: "Which implementation correctly counts the frequency of elements?",
-    codeA: `def count_frequency(arr):
-    freq = {}
-    for num in arr:
-        if num in freq:
-            freq[num] += 1
-    return freq`,
-    codeB: `def count_frequency(arr):
-    freq = {}
-    for num in arr:
-        freq[num] = freq.get(num, 0) + 1
-    return freq`,
-    correctAnswer: "Code B",
-    explanation: "Code B correctly handles all cases using dict.get(), while Code A misses initializing counts for new elements."
-  }
-];
-
 const QuizApp = () => {
   const [answered, setAnswered] = useState({});
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [currentProblemSet, setCurrentProblemSet] = useState(0);
   const questionRefs = useRef([]);
+
+  const handlers = useSwipeable({
+    onSwipedLeft: () => {
+        setCurrentProblemSet((currentProblemSet + 1) % problems.length);
+        setCurrentQuestionIndex(0);
+        // reset all questions to unanswered, without reassigning the object
+        for (let key in answered) {
+          answered[key] = false;
+        }
+    },
+    onSwipedRight: () => {
+      setCurrentProblemSet((currentProblemSet - 1) % problems.length);
+      setCurrentQuestionIndex(0);
+      // reset all questions to unanswered, without reassigning the object
+      for (let key in answered) {
+        answered[key] = false;
+      }
+    },
+    preventDefaultTouchmoveEvent: true,
+    trackMouse: true
+  });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -106,7 +70,7 @@ const QuizApp = () => {
         if (ref) observer.unobserve(ref);
       });
     };
-  }, []);
+  }, [problems[currentProblemSet]]);
 
   const handleAnswer = (questionId, selectedOption) => {
     if (answered[questionId]) return;
@@ -147,15 +111,20 @@ const QuizApp = () => {
     return 'bg-gray-900';
   };
 
+  const isCorrect = (questionId) => {
+    const question = problems[currentProblemSet].find(q => q.id === questionId);
+    return selectedAnswers[questionId] === question.correctAnswer;
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
-      <div className="max-w-4xl mx-auto p-4 space-y-6">
+      <div className="max-w-4xl mx-auto p-4 space-y-6" {...handlers}>
         <div className="flex items-center justify-center gap-2 mb-6">
           <Code size={32} className="text-blue-400" />
           <h1 className="text-3xl font-bold text-center text-blue-400">CheetCode</h1>
         </div>
         
-        {questions.slice(0, currentQuestionIndex + 1).map((question, index) => (
+        {problems[currentProblemSet].slice(0, currentQuestionIndex + 1).map((question, index) => (
           <Card
             key={question.id}
             ref={el => questionRefs.current[question.id] = el}
@@ -210,7 +179,7 @@ const QuizApp = () => {
         ))}
 
         {/* Quiz Completion */}
-        {currentQuestionIndex >= questions.length && (
+        {currentQuestionIndex >= problems[currentProblemSet].length && (
           <Card className="bg-gray-800 border-gray-700">
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold text-center text-gray-100">
