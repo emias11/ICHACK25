@@ -18,6 +18,8 @@ export const problems = [
         else:
             right = mid - 1
     return -1`,
+    codeC: `print('This is dummy code C')`,
+    codeD: `print('This is dummy code D')`,
     options: ["Code A", "Code B"],
     correctAnswer: "Code B",
     explanation: "Code B implements binary search with O(log n) complexity, while Code A uses linear search with O(n) complexity."
@@ -37,6 +39,8 @@ export const problems = [
         left += 1
         right -= 1
     return False`,
+    codeC: `print('This is dummy code C')`,
+    codeD: `print('This is dummy code D')`,
     options: ["Code A", "Code B"],
     correctAnswer: "Code A",
     explanation: "Code A correctly checks for palindromes by comparing the string with its reverse. Code B has a logic error in the return statements."
@@ -55,6 +59,8 @@ export const problems = [
     for num in arr:
         freq[num] = freq.get(num, 0) + 1
     return freq`,
+    codeC: `print('This is dummy code C')`,
+    codeD: `print('This is dummy code D')`,
     options: ["Code A", "Code B"],
     correctAnswer: "Code B",
     explanation: "Code B correctly handles all cases using dict.get(), while Code A misses initializing counts for new elements."
@@ -78,6 +84,8 @@ export const problems = [
         else:
             right = mid - 1
     return -1`,
+    codeC: `print('This is dummy code C')`,
+    codeD: `print('This is dummy code D')`,
     options: ["Code A", "Code B"],
     correctAnswer: "Code B",
     explanation: "Code B implements binary search with O(log n) complexity, while Code A uses linear search with O(n) complexity."
@@ -97,6 +105,8 @@ export const problems = [
         left += 1
         right -= 1
     return False`,
+    codeC: `print('This is dummy code C')`,
+    codeD: `print('This is dummy code D')`,
     options: ["Code A", "Code B"],
     correctAnswer: "Code A",
     explanation: "Code A correctly checks for palindromes by comparing the string with its reverse. Code B has a logic error in the return statements."
@@ -115,6 +125,8 @@ export const problems = [
     for num in arr:
         freq[num] = freq.get(num, 0) + 1
     return freq`,
+    codeC: `print('This is dummy code C')`,
+    codeD: `print('This is dummy code D')`,
     options: ["Code A", "Code B"],
     correctAnswer: "Code B",
     explanation: "Code B correctly handles all cases using dict.get(), while Code A misses initializing counts for new elements."

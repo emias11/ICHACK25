@@ -25,12 +25,12 @@ const QuizApp = () => {
 
   const handlers = useSwipeable({
     onSwipedLeft: () => {
-        setCurrentProblemSet((currentProblemSet + 1) % problems.length);
-        setCurrentQuestionIndex(0);
-        // reset all questions to unanswered, without reassigning the object
-        for (let key in answered) {
-          answered[key] = false;
-        }
+      setCurrentProblemSet((currentProblemSet + 1) % problems.length);
+      setCurrentQuestionIndex(0);
+      // reset all questions to unanswered, without reassigning the object
+      for (let key in answered) {
+        answered[key] = false;
+      }
     },
     onSwipedRight: () => {
       setCurrentProblemSet((currentProblemSet - 1) % problems.length);
@@ -79,7 +79,7 @@ const QuizApp = () => {
       ...prev,
       [questionId]: selectedOption
     }));
-    
+
     setAnswered(prev => ({
       ...prev,
       [questionId]: true
@@ -104,7 +104,7 @@ const QuizApp = () => {
     const isSelected = selectedAnswers[questionId] === option;
     if (isSelected && isCorrectAnswer) {
       return 'bg-[rgba(34,197,94,0.6)]'; // Green with 60% opacity
-    } 
+    }
     if (isSelected && !isCorrectAnswer) {
       return 'bg-[rgba(239,68,68,0.6)]'; // Red with 60% opacity
     }
@@ -123,7 +123,7 @@ const QuizApp = () => {
           <Code size={32} className="text-blue-400" />
           <h1 className="text-3xl font-bold text-center text-blue-400">CheetCode</h1>
         </div>
-        
+
         {problems[currentProblemSet].slice(0, currentQuestionIndex + 1).map((question, index) => (
           <Card
             key={question.id}
@@ -134,12 +134,13 @@ const QuizApp = () => {
               <h2 className="text-xl font-semibold mb-4 text-gray-100">
                 {index + 1}. {question.question}
               </h2>
-              
-              <div className="flex flex-col md:flex-row gap-4 mb-6">
+
+              {/* Grid layout with 2 rows of 2 options */}
+              <div className="grid grid-cols-2 gap-4 mb-6">
                 {/* Code Block A */}
-                <div className="flex-1">
+                <div className="flex justify-center">
                   <div
-                    className={`bg-gray-900 p-4 rounded-lg h-full cursor-pointer ${getCodeBlockStyle(question.id, 'Code A')}`}
+                    className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getCodeBlockStyle(question.id, 'Code A')}`}
                     onClick={() => handleAnswer(question.id, "Code A")}
                   >
                     <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
@@ -149,9 +150,9 @@ const QuizApp = () => {
                 </div>
 
                 {/* Code Block B */}
-                <div className="flex-1">
+                <div className="flex justify-center">
                   <div
-                    className={`bg-gray-900 p-4 rounded-lg h-full cursor-pointer ${getCodeBlockStyle(question.id, 'Code B')}`}
+                    className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getCodeBlockStyle(question.id, 'Code B')}`}
                     onClick={() => handleAnswer(question.id, "Code B")}
                   >
                     <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
@@ -159,8 +160,32 @@ const QuizApp = () => {
                     </SyntaxHighlighter>
                   </div>
                 </div>
+
+                {/* Code Block C (New Option) */}
+                <div className="flex justify-center">
+                  <div
+                    className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getCodeBlockStyle(question.id, 'Code C')}`}
+                    onClick={() => handleAnswer(question.id, "Code C")}
+                  >
+                    <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
+                      {question.codeC}
+                    </SyntaxHighlighter>
+                  </div>
+                </div>
+
+                {/* Code Block D (New Option) */}
+                <div className="flex justify-center">
+                  <div
+                    className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getCodeBlockStyle(question.id, 'Code D')}`}
+                    onClick={() => handleAnswer(question.id, "Code D")}
+                  >
+                    <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
+                      {question.codeD}
+                    </SyntaxHighlighter>
+                  </div>
+                </div>
               </div>
-              
+
               {/* Explanation */}
               {answered[question.id] && (
                 <div className="mt-4 p-4 bg-gray-700 rounded-lg">
@@ -183,7 +208,7 @@ const QuizApp = () => {
           <Card className="bg-gray-800 border-gray-700">
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold text-center text-gray-100">
-                Duel Complete! 🎉
+                Question Complete! 🎉
               </h2>
             </CardContent>
           </Card>
