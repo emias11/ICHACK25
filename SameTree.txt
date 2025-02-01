@@ -1,0 +1,42 @@
+// Problem name
+Same Tree 
+
+// Url
+https://leetcode.com/problems/same-tree/description/
+
+// Statement
+Given the roots of two binary trees p and q, write a function to check if they are the same or not.
+Two binary trees are considered the same if they are structurally identical, and the nodes have the same value.
+
+Input: p = [1,2,3], q = [1,2,3]
+Output: true
+
+Input: p = [1,2,1], q = [1,1,2]
+Output: false
+
+
+// Questions
+
+1. Select which of the following images represent identical trees.
+
+- Insert here images from images/SameTree/q1-*.jpg
+
+2. What data structure can we use to represent the tree? 
+
+Code snippets
+- List of nodes
+- One should be a TreeNode with val, leftNode, rightNode
+- Maybe a dictionary, ask chatgpt for some other random incorrect ones 
+
+3. How do you want to move through the tree?
+
+If they say recursion: 3a. What are the base cases?
+
+If both nodes are empty. 
+This is when we can pull out boilerplate, and add the base cases. 
+
+If they say iteratively: 3b. Should you use DFS or BFS?
+4b. What data structure should be used to store the nodes we visit? stack, queue 
+This is where we pull out boilerplate. 
+
+
