@@ -1,6 +1,8 @@
 from openai import OpenAI
 import uuid
 from datetime import datetime
+from api_calls import *
+from response_to_json import *
 
 client = OpenAI(api_key="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")
 
@@ -50,23 +52,69 @@ def save_conversation_to_file(filename):
                 file.write(f"{role.capitalize()}: {content}\n")
     except Exception as e:
         print(f"Error saving conversation: {e}")
+
+def get_user_input():
+    input("User input for OpenAI: ")
+    # while True: 
         
+
 if __name__ == "__main__":
-    print("Type 'exit' to quit the conversation.")
+    
+    api_url = ""
+    while True: 
+        # 1. Get the question from /leetcode. E.g. Same Tree
+        question = get_leetcode_question(api_url)
+        
+        print("User input")
+        response = get_openai_response(question)
+        parsed_response = parse_openai_response(response)
+        
+        # 2. Define a problem statement and choices (this would typically come from OpenAI or other logic)
+        problem_statement = parsed_response["problem_statement"] 
+        choices = parsed_response["choices"]
+        question_for_user = parsed_response["question"]
+        
+        # 3. Send the question, problem statement, and choices to /prompts/choices and wait for an answer
+        answer = post_initial_data(api_url, question_for_user, problem_statement, choices)
+        
+        explanation = ""
+        is_correct = ""
+        while True: 
+            # 4. Input the answer received from the user to this bs. 
+            response = get_openai_response(answer)
+            parsed_response = parse_openai_response(response)
+            
+            # 5. Post the result to /result with correct or incorrect status and explanation
+            explanation = parsed_response["explanation"] 
+            is_correct = parsed_response["correct"]
+            question = parsed_response["question"]
+            choices = parsed_response["choices"]
+            post_result(api_url, is_correct, explanation)
+            
+            # 6. Send the question and choices to /next_question (new function)
+            answer = post_next_question(api_url, question, choices)
+            if answer == "exit": 
+                break 
 
-    try:
-        while True:
-            prompt = input("Enter a prompt for OpenAI: ")
-            if prompt.lower() == "exit":
-                print("Exiting the conversation...")
-                break  # Exit the loop if the user types "exit"
+        # 7. Continue looping (the next iteration will fetch another question)
+        time.sleep(2)  # Adjust the sleep time if needed
 
-            response = get_openai_response(prompt)
-            print("Response:", response)
+    
+    # print("Type 'exit' to quit the conversation.")
 
-    except KeyboardInterrupt:
-        print("\nSession interrupted. Saving conversation...")
+    # try:
+    #     while True:
+    #         prompt = get_user_input()
+    #         if prompt.lower() == "exit":
+    #             print("Exiting the conversation...")
+    #             break  # Exit the loop if the user types "exit"
 
-    # Save the conversation after exit or interruption (Ctrl+C)
-    save_conversation_to_file(generate_filename())
-    print("Conversation saved to history.")
+    #         response = get_openai_response(prompt)
+    #         print("Response:", response)
+
+    # except KeyboardInterrupt:
+    #     print("\nSession interrupted. Saving conversation...")
+
+    # # Save the conversation after exit or interruption (Ctrl+C)
+    # save_conversation_to_file(generate_filename())
+    # print("Conversation saved to history.")

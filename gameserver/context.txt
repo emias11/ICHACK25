@@ -38,7 +38,6 @@ THIS SHOULD BE USED FOR ALL ANSWERS APART FROM THE INITIAL REQUEST CONTAINING TH
 # Next Question:
 <Insert next question here>
 
-- Insert options here in json format including their code snippets as a "code" field.
 A) <Option A number, information, and code snippet>
 B) <Option B number, information, and code snippet>
 ... etc other options if there are
