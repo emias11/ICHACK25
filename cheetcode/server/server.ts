@@ -1,82 +1,91 @@
-import express from 'express';
-import bodyParser from 'body-parser';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 
 const app = express();
-const port = 3001;
+const port = 3001; // Port for the Express server
 
 // Middleware
-app.use(cors()); // Allow cross-origin requests
-app.use(bodyParser.json()); // Parse incoming JSON requests
+app.use(cors()); // Enable CORS for cross-origin requests
+app.use(express.json()); // Parse JSON bodies
 
-// Store the question temporarily
-let currentQuestion = null;
+// In-memory storage for the question and answer
+let currentQuestion: {
+  id: string;
+  question: string;
+  choices: string[];
+} | null = null;
 
-// Single POST endpoint for handling question and answer exchange
-app.post('/prompt', async (req, res) => {
-  const { text, answer } = req.body; // Destructure the request body
+let userAnswer: string | null = null;
+let explanation: string | null = null;
 
-  if (answer) {
-    // Step 2: Answer received, send it back to Python
-    console.log(`Answer received: ${answer}`);
-    return res.json({
-      answer: answer, // Send the answer back to Python
-      status: 'answer_received',
-    });
+// POST endpoint: Python script sends the question
+app.post('/prompt/choices', (req: Request, res: Response) => {
+  const { question, choices } = req.body;
+
+  // Generate a unique ID for the question
+  const questionId = Math.random().toString(36).substring(7);
+
+  // Store the question
+  currentQuestion = {
+    id: questionId,
+    question,
+    choices,
+  };
+
+  // Wait for the user to answer (long-polling)
+  const waitForAnswer = async () => {
+    while (userAnswer === null) {
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Poll every second
+    }
+
+    // Send the answer back to the Python script
+    res.json({ answer: userAnswer, explanation });
+
+    // Reset for the next question
+    userAnswer = null;
+    currentQuestion = null;
+    explanation = null;
+  };
+
+  waitForAnswer();
+});
+
+// GET endpoint: React app fetches the question
+app.get('/prompt/choices', (req: Request, res: Response) => {
+  if (!currentQuestion) {
+    return res.status(404).json({ message: 'No question available' });
   }
 
-  // Step 1: No answer, send the question to the frontend
-  currentQuestion = text; // Store the question in the server
-
-  return res.json({
-    question: currentQuestion, // Send the question to the frontend
-    status: 'question_received',
-    message: 'Please answer the question on the frontend.',
-  });
+  res.json(currentQuestion);
 });
 
+// PUT endpoint: React app sends the selected answer
+app.put('/prompt/choices', (req: Request, res: Response) => {
+  const { questionId, answer } = req.body;
+
+  if (!questionId || !answer) {
+    return res.status(400).json({ message: 'Missing questionId or answer' });
+  }
+
+  if (currentQuestion && currentQuestion.id === questionId) {
+    userAnswer = answer;
+    explanation = `Explanation for choosing ${answer}`; // Replace with actual explanation logic
+    res.json({ success: true });
+  } else {
+    res.status(404).json({ message: 'Question not found' });
+  }
+});
+
+// GET endpoint: React app fetches the explanation
+app.get('/explanation', (req: Request, res: Response) => {
+  if (!explanation) {
+    return res.status(404).json({ message: 'No explanation available' });
+  }
+
+  res.json({ explanation });
+});
+
+// Start the server
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Express server running on http://localhost:${port}`);
 });
-
-/* import express from 'express';
-import bodyParser from 'body-parser';
-import next from 'next';
-
-const dev = process.env.NODE_ENV !== 'production';
-const app = next({ dev });
-const handle = app.getRequestHandler();
-
-let currentQuestion = {timestamp: 0, type: "", prompt: "", answer: ""}; // Heaped current question
-
-app.prepare().then(() => {
-  const server = express();
-  const PORT = 3001;
-
-  // Middleware to parse JSON requests
-  server.use(bodyParser.json());
-
-  // Create a simple endpoint to handle POST requests from Python
-  server.post('/prompt/text', (req, res) => {
-    const { timestamp, text } = req.body;
-
-    // Update the timestamp and store the text data
-    currentQuestion.timestamp = timestamp;
-    currentQuestion.type = "text";
-    currentQuestion.prompt = text;
-
-    res.status(200).json({ answer : "My name is 10" })
-  });
-
-  // Handle all other routes through Next.js
-  server.all('*', (req, res) => {
-    return handle(req, res);
-  });
-
-  // Start the server on the specified port
-  server.listen(PORT, (err?: any) => {
-    if (err) throw err;
-    console.log(`Express server running on http://localhost:${PORT}`);
-  });
-});
- */

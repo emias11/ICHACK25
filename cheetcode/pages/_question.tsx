@@ -48,7 +48,7 @@ const QuestionPage = () => {
 
   // Send the user's answer back to Python
   const sendAnswerToPython = async (answer: string) => {
-    const pythonUrl = 'http://localhost:5000/receive_answer'; // Python API endpoint
+    const pythonUrl = 'http://localhost:3001/receive_answer'; // Python API endpoint
     const response = await fetch(pythonUrl, {
       method: 'POST',
       headers: {
