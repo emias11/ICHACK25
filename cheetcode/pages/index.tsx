@@ -100,7 +100,7 @@ const QuizApp = () => {
   // Helper function for determining the background color of the code block
   const getCodeBlockStyle = (questionId, option) => {
     if (!answered[questionId]) return 'bg-gray-900';
-    const isCorrectAnswer = selectedAnswers[questionId] === questions.find(q => q.id === questionId).correctAnswer;
+    const isCorrectAnswer = selectedAnswers[questionId] === problems[currentProblemSet].find(q => q.id === questionId).correctAnswer;
     const isSelected = selectedAnswers[questionId] === option;
     if (isSelected && isCorrectAnswer) {
       return 'bg-[rgba(34,197,94,0.6)]'; // Green with 60% opacity
