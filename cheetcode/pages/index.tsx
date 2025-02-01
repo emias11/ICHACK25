@@ -93,11 +93,13 @@ const QuizApp = () => {
 
   const getDivColour = (questionId, option) => {
     if (!answered[questionId]) return ''; // No class if not answered
+    const isCorrectAnswer = selectedAnswers[questionId] === problems[currentProblemSet].find(q => q.id === questionId).correctAnswer;
+    const isSelected = selectedAnswers[questionId] === option;
 
-    if (selectedAnswers[questionId] === option) {
-      return selectedAnswers[questionId] === problems[currentProblemSet][questionId].correctAnswer
-        ? 'bg-[rgba(34,197,94,1)]' // Correct
-        : 'bg-[rgba(239,68,68,1)]';  // Incorrect
+    if (isSelected) {
+      return isCorrectAnswer
+        ? 'bg-green-900' // Correct
+        : 'bg-red-900';  // Incorrect
     }
 
     return ''; // No class if option is not selected
