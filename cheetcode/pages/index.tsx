@@ -91,23 +91,16 @@ const QuizApp = () => {
     }, 1000);
   };
 
-  // Helper function for determining the background color of the code block
-  const getCodeBlockStyle = (questionId, option) => {
-    if (!answered[questionId]) return 'bg-gray-900';
-    const isCorrectAnswer = selectedAnswers[questionId] === problems[currentProblemSet].find(q => q.id === questionId).correctAnswer;
-    const isSelected = selectedAnswers[questionId] === option;
-    if (isSelected && isCorrectAnswer) {
-      return 'bg-[rgba(34,197,94,0.6)]'; // Green with 60% opacity
-    }
-    if (isSelected && !isCorrectAnswer) {
-      return 'bg-[rgba(239,68,68,0.6)]'; // Red with 60% opacity
-    }
-    return 'bg-gray-900';
-  };
+  const getDivColour = (questionId, option) => {
+    if (!answered[questionId]) return ''; // No class if not answered
 
-  const isCorrect = (questionId) => {
-    const question = problems[currentProblemSet].find(q => q.id === questionId);
-    return selectedAnswers[questionId] === question.correctAnswer;
+    if (selectedAnswers[questionId] === option) {
+      return selectedAnswers[questionId] === problems[currentProblemSet][questionId].correctAnswer
+        ? 'bg-[rgba(34,197,94,1)]' // Correct
+        : 'bg-[rgba(239,68,68,1)]';  // Incorrect
+    }
+
+    return ''; // No class if option is not selected
   };
 
   return (
@@ -134,7 +127,7 @@ const QuizApp = () => {
                 {/* Code Block A */}
                 <div className="flex justify-center">
                   <div
-                    className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getCodeBlockStyle(question.id, 'Code A')}`}
+                    className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getDivColour(question.id, "Code A")}`}
                     onClick={() => handleAnswer(question.id, "Code A")}
                   >
                     <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
@@ -146,7 +139,7 @@ const QuizApp = () => {
                 {/* Code Block B */}
                 <div className="flex justify-center">
                   <div
-                    className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getCodeBlockStyle(question.id, 'Code B')}`}
+                    className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getDivColour(question.id, "Code B")}`}
                     onClick={() => handleAnswer(question.id, "Code B")}
                   >
                     <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
@@ -158,7 +151,7 @@ const QuizApp = () => {
                 {/* Code Block C (New Option) */}
                 <div className="flex justify-center">
                   <div
-                    className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getCodeBlockStyle(question.id, 'Code C')}`}
+                    className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getDivColour(question.id, "Code C")}`}
                     onClick={() => handleAnswer(question.id, "Code C")}
                   >
                     <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
@@ -170,7 +163,7 @@ const QuizApp = () => {
                 {/* Code Block D (New Option) */}
                 <div className="flex justify-center">
                   <div
-                    className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getCodeBlockStyle(question.id, 'Code D')}`}
+                    className={`bg-gray-900 p-4 rounded-lg w-full cursor-pointer ${getDivColour(question.id, "Code D")}`}
                     onClick={() => handleAnswer(question.id, "Code D")}
                   >
                     <SyntaxHighlighter language="python" style={customDarkTheme} className="text-gray-100">
