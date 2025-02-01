@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { Card, CardContent } from '@/components/ui/card';
 import { Check, X, Code } from 'lucide-react';
-import { problems } from '@/data/questions';
+import { problems, all_topics } from '@/data/questions';
 
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -16,21 +16,35 @@ const customDarkTheme = {
   },
 };
 
+const hasCommonTopic = (topics1, topics2) => {
+  console.log(topics1, topics2);
+  return topics1.some(topic => topics2.includes(topic));
+};
+
 const QuizApp = () => {
   const [answered, setAnswered] = useState({});
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentProblemSet, setCurrentProblemSet] = useState(0);
+  const [topics, setTopics] = useState(all_topics);
   const questionRefs = useRef([]);
 
   const handlers = useSwipeable({
     onSwipedLeft: () => {
-      setCurrentProblemSet((currentProblemSet + 1) % problems.length);
+      let i = 1;
+      while (i < problems.length && !hasCommonTopic(problems[(currentProblemSet + i) % problems.length].topics, topics)) {
+        i++;
+      }
+      setCurrentProblemSet((currentProblemSet + i) % problems.length);
       setCurrentQuestionIndex(0);
       setAnswered({});
     },
     onSwipedRight: () => {
-      setCurrentProblemSet((currentProblemSet - 1 + problems.length) % problems.length);
+      let i = 1;
+      while (i < problems.length && !hasCommonTopic(problems[(currentProblemSet + problems.length - i) % problems.length].topics, topics)) {
+        i++;
+      }
+      setCurrentProblemSet((currentProblemSet + problems.length - i) % problems.length);
       setCurrentQuestionIndex(0);
       setAnswered({});
     },
