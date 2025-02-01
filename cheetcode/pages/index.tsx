@@ -27,18 +27,12 @@ const QuizApp = () => {
     onSwipedLeft: () => {
       setCurrentProblemSet((currentProblemSet + 1) % problems.length);
       setCurrentQuestionIndex(0);
-      // reset all questions to unanswered, without reassigning the object
-      for (let key in answered) {
-        answered[key] = false;
-      }
+      setAnswered({});
     },
     onSwipedRight: () => {
-      setCurrentProblemSet((currentProblemSet - 1) % problems.length);
+      setCurrentProblemSet((currentProblemSet - 1 + problems.length) % problems.length);
       setCurrentQuestionIndex(0);
-      // reset all questions to unanswered, without reassigning the object
-      for (let key in answered) {
-        answered[key] = false;
-      }
+      setAnswered({});
     },
     preventDefaultTouchmoveEvent: true,
     trackMouse: true
