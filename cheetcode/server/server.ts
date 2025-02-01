@@ -1,3 +1,4 @@
+// server.ts
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 
@@ -9,17 +10,27 @@ app.use(cors()); // Enable CORS for cross-origin requests
 app.use(express.json()); // Parse JSON bodies
 
 // In-memory storage for the question and answer
+let currentTheme: string | null = null; // Store the selected theme
 let currentQuestion: {
   id: string;
   question: string;
-  choices: string[];
+  choices: Record<string, string>;
 } | null = null;
 
 let userAnswer: string | null = null;
-let explanation: string | null = null;
+let result: { correct: boolean; explanation: string } | null = null;
 
-// POST endpoint: Python script sends the question
-app.post('/prompt/choices', (req: Request, res: Response) => {
+// GET endpoint: Python script fetches the selected theme
+app.get('/leetcode_question', (req: Request, res: Response) => {
+  if (!currentTheme) {
+    return res.status(404).json({ message: 'No theme selected' });
+  }
+
+  res.json({ theme: currentTheme });
+});
+
+// POST endpoint: Python script sends the question and choices
+app.post('/prompts/choices', (req: Request, res: Response) => {
   const { question, choices } = req.body;
 
   // Generate a unique ID for the question
@@ -32,35 +43,27 @@ app.post('/prompt/choices', (req: Request, res: Response) => {
     choices,
   };
 
+  console.log("Received question")
+
   // Wait for the user to answer (long-polling)
   const waitForAnswer = async () => {
     while (userAnswer === null) {
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Poll every second
     }
 
-    // Send the answer back to the Python script
-    res.json({ answer: userAnswer, explanation });
+    // Send the question ID back to the Python script
+    res.status(200).json({ questionId });
 
     // Reset for the next question
     userAnswer = null;
     currentQuestion = null;
-    explanation = null;
   };
 
   waitForAnswer();
 });
 
-// GET endpoint: React app fetches the question
-app.get('/prompt/choices', (req: Request, res: Response) => {
-  if (!currentQuestion) {
-    return res.status(404).json({ message: 'No question available' });
-  }
-
-  res.json(currentQuestion);
-});
-
-// PUT endpoint: React app sends the selected answer
-app.put('/prompt/choices', (req: Request, res: Response) => {
+// POST endpoint: React app sends the selected answer
+app.post('/answer', (req: Request, res: Response) => {
   const { questionId, answer } = req.body;
 
   if (!questionId || !answer) {
@@ -69,20 +72,35 @@ app.put('/prompt/choices', (req: Request, res: Response) => {
 
   if (currentQuestion && currentQuestion.id === questionId) {
     userAnswer = answer;
-    explanation = `Explanation for choosing ${answer}`; // Replace with actual explanation logic
-    res.json({ success: true });
+    res.status(200).json({ success: true });
   } else {
     res.status(404).json({ message: 'Question not found' });
   }
 });
 
-// GET endpoint: React app fetches the explanation
-app.get('/explanation', (req: Request, res: Response) => {
-  if (!explanation) {
-    return res.status(404).json({ message: 'No explanation available' });
+// POST endpoint: Python script sends the result (correctness and explanation)
+app.post('/result', (req: Request, res: Response) => {
+  const { questionId, correct, explanation } = req.body;
+
+  if (!questionId || correct === undefined || !explanation) {
+    return res.status(400).json({ message: 'Missing questionId, correct, or explanation' });
   }
 
-  res.json({ explanation });
+  // Store the result
+  result = { correct, explanation };
+  res.status(200).json({ success: true });
+});
+
+// POST endpoint: React app sends the selected theme
+app.post('/select_theme', (req: Request, res: Response) => {
+  const { theme } = req.body;
+
+  if (!theme) {
+    return res.status(400).json({ message: 'Missing theme' });
+  }
+
+  currentTheme = theme;
+  res.status(200).json({ success: true });
 });
 
 // Start the server
