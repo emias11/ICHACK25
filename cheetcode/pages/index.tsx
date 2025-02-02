@@ -28,7 +28,7 @@ interface Result {
 
 const QuizApp = () => {
   const [currentProblemSet, setCurrentProblemSet] = useState(0);
-  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  const [selectedTopics, setSelectedTopics] = useState<string[]>(['All']);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
   const [isAnswered, setIsAnswered] = useState<Record<string, boolean>>({});
@@ -121,14 +121,24 @@ onSwipedRight: async () => {
   };
 
   const handleTopicSelection = (topic: string) => {
-    setSelectedTopics((prevSelected) => {
-      if (prevSelected.includes(topic)) {
-        return prevSelected.filter(t => t !== topic);
-      } else {
-        return [...prevSelected, topic];
+  setSelectedTopics((prevSelected) => {
+    if (topic === "All") {
+      // If "All" is clicked, select it only if no other topics are selected
+      return prevSelected.length === 1 && prevSelected.includes("All")
+        ? [] // Unselect "All" if it's already the only selected topic
+        : ["All"]; // Select "All" and deselect other topics
+    } else {
+      if (prevSelected.includes("All")) {
+        // If "All" is selected, remove it before selecting other topics
+        return [topic];
       }
-    });
-  };
+      return prevSelected.includes(topic)
+        ? prevSelected.filter(t => t !== topic) // Deselect if already selected
+        : [...prevSelected, topic]; // Otherwise, select the topic
+    }
+  });
+};
+
 
   useEffect(() => {
   const fetchQuestion = async () => {

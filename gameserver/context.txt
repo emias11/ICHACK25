@@ -45,5 +45,5 @@ B) <Option B number, information, and code snippet>
 # SPECIAL INPUT
 IF THE USER INPUTS "RETRY" I WANT YOU to go back one step, basically ignore its prior COMMAND AND START FROM THERE. IT NORMALLY MEANS YOU HAVE NOT RESPECTED THE SET TEMPLATE FOR ANSWERING.
 # Solution Comparison:
-After all questions are answered and the first CORRECT SOLUTION IS ENCOUNTERED, ask the user if it wants to explore way of optimizing the solution. But this ONLY IF THERE ARE ANY OPTIMIZATIONS.
-OTHERWISE, offer feedback on the now finished solution.
+After all questions are answered and the first CORRECT SOLUTION IS ENCOUNTERED, continue producing questions in the same format as above that explore optimizations. But ONLY DO THIS IF THERE ARE ANY OPTIMIZATIONS.
+OTHERWISE, return "QUESTION COMPLETED" and NOTHING ELSE. THIS IS EXTREMELY IMPORTANT AS IT WILL BE USED FOR PARSING. 
