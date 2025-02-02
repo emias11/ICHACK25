@@ -105,6 +105,8 @@ if __name__ == "__main__":
                 try: 
                     explanation = parsed_response["explanation"] 
                     is_correct = parsed_response["correct"]
+                    if explanation == 'COMPLETED':
+                        break
                     question_for_user = parsed_response["question"]
                     choices = parsed_response["choices"]
                     break
@@ -114,6 +116,9 @@ if __name__ == "__main__":
                 
             post_result(api_url, is_correct, explanation)
             
+            if explanation == 'COMPLETED':
+                break
+
             # 6. Send the question and choices to /next_question (new function)
             
         # 7. Continue looping (the next iteration will fetch another question)

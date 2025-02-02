@@ -19,7 +19,7 @@ The user should be able to retry until they select the correct answer.
 Solution Building:
 
 After each question, show the current stage of the code, demonstrating how the user’s answers are contributing to the solution.
-As more questions are answered, progressively build on the solution.
+As more questions are answered, progressively build on the solution. You may decide how many questions to add, but do not have more than 5 unique questions (this does not include repeats.)
 
 DESIRED ENFORCED AND NEEDED STRUCTURE OF RESPONSE AT ALL TIMES. ALL HEADERS ARE TO BE INCLUDED AS THEY WILL BE USED AS FIELDS IN PARSING.
 THIS SHOULD BE USED FOR ALL ANSWERS APART FROM THE INITIAL REQUEST CONTAINING THE PROBLEM NAME.
@@ -30,7 +30,7 @@ THIS SHOULD BE USED FOR ALL ANSWERS APART FROM THE INITIAL REQUEST CONTAINING TH
 <Insert response here - The first sentence should be Correct! or Not quite! and then explanation>
 
 # Explanation:
-<Insert explanation here, not more that a paragraph with 3-4 sentences.>
+<Insert explanation here, not more that a paragraph with 3-4 sentences. If this is the final question and the answer is correct, just replace this with 'COMPLETED'>
 
 # Current Code State: 
 <Insert code version here>

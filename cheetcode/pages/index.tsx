@@ -341,6 +341,17 @@ const QuizApp = () => {
             </Card>
           ))}
         </div>
+
+        {/* Quiz Completion - Move this outside of the questions map */}
+        {Object.values(results).some(result => result.explanation === "COMPLETED") && (
+          <Card className="mt-6 bg-gray-800 border-gray-700">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold text-center text-gray-100">
+                Question Complete! 🎉
+              </h2>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <style jsx>{`
