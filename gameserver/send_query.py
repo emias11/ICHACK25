@@ -70,9 +70,15 @@ if __name__ == "__main__":
         parsed_response = parse_openai_response(response)
         
         # 2. Define a problem statement and choices (this would typically come from OpenAI or other logic)
-        problem_statement = parsed_response["problem_statement"] 
-        choices = parsed_response["choices"]
-        question_for_user = parsed_response["question"]
+        while True:
+            try:
+                problem_statement = parsed_response["problem_statement"] 
+                choices = parsed_response["choices"]
+                question_for_user = parsed_response["question"]
+                break
+            except KeyError:
+                response = get_openai_response("retry")
+                parsed_response = parse_openai_response(response)
         
         # 3. Send the question, problem statement, and choices to /prompts/choices and wait for an answer
         answer = post_initial_data(api_url, question_for_user, problem_statement, choices)
@@ -85,10 +91,17 @@ if __name__ == "__main__":
             parsed_response = parse_openai_response(response)
             
             # 5. Post the result to /result with correct or incorrect status and explanation
-            explanation = parsed_response["explanation"] 
-            is_correct = parsed_response["correct"]
-            question = parsed_response["question"]
-            choices = parsed_response["choices"]
+            while True:
+                try: 
+                    explanation = parsed_response["explanation"] 
+                    is_correct = parsed_response["correct"]
+                    question = parsed_response["question"]
+                    choices = parsed_response["choices"]
+                    break
+                except KeyError:
+                    response = get_openai_response(answer)
+                    parsed_response = parse_openai_response(response)
+                
             post_result(api_url, is_correct, explanation)
             
             # 6. Send the question and choices to /next_question (new function)
