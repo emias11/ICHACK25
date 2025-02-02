@@ -62,12 +62,13 @@ if __name__ == "__main__":
     
     api_url = "http://localhost:3001/"
     while True: 
-        # 1. Get the question from /leetcode. E.g. Same Tree
+        # 1. Get the question from /leetcode_question. E.g. Same Tree
         question = get_leetcode_question(api_url)
         
         print("User input")
         response = get_openai_response(question)
         parsed_response = parse_openai_response(response)
+        print(parsed_response)
         
         # 2. Define a problem statement and choices (this would typically come from OpenAI or other logic)
         problem_statement = parsed_response["problem_statement"] 

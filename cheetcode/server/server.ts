@@ -21,7 +21,7 @@ app.get('/leetcode_question', (req: Request, res: Response) => {
   if (!currentTheme) {
     return res.status(404).json({ message: 'No theme selected' });
   }
-  res.json({ theme: currentTheme });
+  res.json({ question: currentTheme });
 });
 
 // Get current question
@@ -35,15 +35,32 @@ app.get('/current-question', (req: Request, res: Response) => {
 // Python script sends the question
 app.post('/prompts/choices', (req: Request, res: Response) => {
   const { question, choices } = req.body;
+
+  // Generate a unique ID for the question
   const questionId = Math.random().toString(36).substring(7);
-  
+
+  // Store the question
   currentQuestion = {
     id: questionId,
     question,
     choices,
   };
-  
-  res.status(200).json({ questionId });
+
+  // Wait for the user to answer (long-polling)
+  const waitForAnswer = async () => {
+    while (userAnswer === null) {
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Poll every second
+    }
+
+    // Send the question ID back to the Python script
+    res.status(200).json({ questionId });
+
+    // Reset for the next question
+    userAnswer = null;
+    currentQuestion = null;
+  };
+
+  waitForAnswer();
 });
 
 // Handle user answer
