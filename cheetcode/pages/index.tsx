@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { Card, CardContent } from '@/components/ui/card';
-import { Check, X, Code } from 'lucide-react';
+import { Check, X, Code, ListFilterPlusIcon } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { problems, all_topics } from '@/data/questions';
@@ -12,8 +12,10 @@ const QuizApp = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentProblemSet, setCurrentProblemSet] = useState(0);
   const [topics, setTopics] = useState(all_topics);
+  const [selectedTopics, setSelectedTopics] = useState([]);
   const [isAnimating, setIsAnimating] = useState(false);
   const [slideDirection, setSlideDirection] = useState('');
+  const [showTopicMenu, setShowTopicMenu] = useState(false);
   const questionRefs = useRef([]);
 
   const customDarkTheme = {
@@ -50,31 +52,31 @@ const QuizApp = () => {
     }, 1000);
   };
 
-  const hasCommonTopic = (topics1, topics2) => {
-    return topics1.some(topic => topics2.includes(topic));
+  const hasCommonTopic = (problemTopics) => {
+    return selectedTopics.length === 0 || selectedTopics.some(topic => problemTopics.includes(topic));
   };
 
   const changeProblemSet = (direction) => {
     if (isAnimating) return;
-    
+
     setIsAnimating(true);
     setSlideDirection(direction);
 
     setTimeout(() => {
       if (direction === 'slide-left') {
         let i = 1;
-        while (i < problems.length && !hasCommonTopic(problems[(currentProblemSet + i) % problems.length].topics, topics)) {
+        while (i < problems.length && !hasCommonTopic(problems[(currentProblemSet + i) % problems.length].topics)) {
           i++;
         }
         setCurrentProblemSet((currentProblemSet + i) % problems.length);
       } else {
         let i = 1;
-        while (i < problems.length && !hasCommonTopic(problems[(currentProblemSet + problems.length - i) % problems.length].topics, topics)) {
+        while (i < problems.length && !hasCommonTopic(problems[(currentProblemSet + problems.length - i) % problems.length].topics)) {
           i++;
         }
         setCurrentProblemSet((currentProblemSet + problems.length - i) % problems.length);
       }
-      
+
       setCurrentQuestionIndex(0);
       setAnswered({});
       setSelectedAnswers({});
@@ -82,6 +84,16 @@ const QuizApp = () => {
       setSlideDirection('');
       setIsAnimating(false);
     }, 300);
+  };
+
+  const handleTopicSelection = (topic) => {
+    setSelectedTopics((prevSelected) => {
+      if (prevSelected.includes(topic)) {
+        return prevSelected.filter(t => t !== topic);
+      } else {
+        return [...prevSelected, topic];
+      }
+    });
   };
 
   const handlers = useSwipeable({
@@ -99,11 +111,11 @@ const QuizApp = () => {
           transition: transform 0.3s ease-out;
           position: relative;
         }
-        
+
         .slide-left {
           animation: slideOutLeft 0.3s ease-out forwards;
         }
-        
+
         .slide-right {
           animation: slideOutRight 0.3s ease-out forwards;
         }
@@ -159,12 +171,59 @@ const QuizApp = () => {
         .slide-right + .problem-container {
           animation: slideInLeft 0.3s ease-out forwards;
         }
+
+        .topic-bubble {
+          display: inline-block;
+          padding: 8px 16px;
+          margin: 4px;
+          border-radius: 9999px;
+          background-color: #2d3748;
+          color: #fff;
+          cursor: pointer;
+          transition: background-color 0.3s;
+        }
+
+        .topic-bubble.selected {
+          background-color: #4fd1c5;
+          font-weight: bold;
+        }
+
+        .topic-bubble:hover {
+          background-color: #2b6cb0;
+        }
+
+        .topic-menu {
+          display: ${showTopicMenu ? 'block' : 'none'};
+        }
       `}</style>
 
       <div className="max-w-4xl mx-auto p-4 space-y-6">
-        <div className="flex items-center justify-center gap-2 mb-6">
-          <Code size={32} className="text-blue-400" />
-          <h1 className="text-3xl font-bold text-center text-blue-400">CheetCode</h1>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <Code size={32} className="text-blue-400" />
+            <h1 className="text-3xl font-bold text-center text-blue-400">CheetCode</h1>
+          </div>
+
+          <button
+          className="flex items-center text-blue-400 border border-blue-400 px-4 py-2 rounded-lg hover:bg-blue-400 hover:text-white"
+          onClick={() => setShowTopicMenu(prev => !prev)}
+        >
+          <Filter size={20} className="mr-2" />
+          Filter
+        </button>
+        </div>
+
+        {/* Topic Filter Section */}
+        <div className={`topic-menu flex flex-wrap justify-center gap-2 mb-6`}>
+          {all_topics.map((topic) => (
+            <div
+              key={topic}
+              className={`topic-bubble ${selectedTopics.includes(topic) ? 'selected' : ''}`}
+              onClick={() => handleTopicSelection(topic)}
+            >
+              {topic}
+            </div>
+          ))}
         </div>
 
         <div {...handlers} className="relative overflow-hidden">
@@ -172,7 +231,7 @@ const QuizApp = () => {
             <h2 className="text-xl font-semibold text-center text-gray-100">
               {problems[currentProblemSet].problem_title}
             </h2>
-            
+
             <p className="text-center text-gray-400 mt-4">
               {problems[currentProblemSet].problem_description}
             </p>
