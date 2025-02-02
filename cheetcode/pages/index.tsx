@@ -36,6 +36,24 @@ const QuizApp = () => {
   const [showTopicMenu, setShowTopicMenu] = useState(false);
   const questionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
+  const sendExitSignal = async () => {
+  try {
+    const response = await fetch("http://localhost:3001/answer", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ questionId: 0, answer: "exit" }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to send exit signal");
+    }
+  } catch (error) {
+    console.error("Error sending exit signal:", error);
+  }
+};
+
   // Fixed hasCommonTopic function
   const hasCommonTopic = (problemTopics: string[]) => {
     return selectedTopics.length === 0 || selectedTopics.some(topic => problemTopics.includes(topic));
@@ -44,58 +62,33 @@ const QuizApp = () => {
   // Handle swipe gestures for problem selection with clearing questions
   const handlers = useSwipeable({
   onSwipedLeft: async () => {
-  // First send exit signal and wait for all pending requests to complete
-  try {
-    await fetch('http://localhost:3001/select_theme', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        theme: problems[(currentProblemSet + 1) % problems.length].problem_title 
-      }),
-    });
-  } catch (error) {
-    console.error('Failed to send exit signal:', error);
-  }
+    await sendExitSignal().catch((error) => console.error("Failed to send exit signal:", error));
 
-      // Then proceed with the swipe logic
-  let i = 1;
-  while (i < problems.length && !hasCommonTopic(problems[(currentProblemSet + i) % problems.length].topics)) {
-    i++;
-  }
-  const newProblemSet = (currentProblemSet + i) % problems.length;
-  setCurrentProblemSet(newProblemSet);
-  clearQuestions();
-},
+    // Continue with existing swipe logic
+    let i = 1;
+    while (i < problems.length && !hasCommonTopic(problems[(currentProblemSet + i) % problems.length].topics)) {
+      i++;
+    }
+    const newProblemSet = (currentProblemSet + i) % problems.length;
+    setCurrentProblemSet(newProblemSet);
+    clearQuestions();
+    updateTheme(problems[newProblemSet].problem_title);
+  },
+  onSwipedRight: async () => {
+    await sendExitSignal().catch((error) => console.error("Failed to send exit signal:", error));
 
-onSwipedRight: async () => {
-  // First send exit signal and wait for all pending requests to complete
-  try {
-    await fetch('http://localhost:3001/select_theme', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        theme: problems[(currentProblemSet - 1 + problems.length) % problems.length].problem_title 
-      }),
-    });
-  } catch (error) {
-    console.error('Failed to send exit signal:', error);
-  }
-
-  // Then proceed with the swipe logic
-  let i = 1;
-  while (i < problems.length && !hasCommonTopic(problems[(currentProblemSet + problems.length - i) % problems.length].topics)) {
-    i++;
-  }
-  const newProblemSet = (currentProblemSet + problems.length - i) % problems.length;
-  setCurrentProblemSet(newProblemSet);
-  clearQuestions();
-},
+    // Continue with existing swipe logic
+    let i = 1;
+    while (i < problems.length && !hasCommonTopic(problems[(currentProblemSet + problems.length - i) % problems.length].topics)) {
+      i++;
+    }
+    const newProblemSet = (currentProblemSet + problems.length - i) % problems.length;
+    setCurrentProblemSet(newProblemSet);
+    clearQuestions();
+    updateTheme(problems[newProblemSet].problem_title);
+  },
   preventDefaultTouchmoveEvent: true,
-  trackMouse: true
+  trackMouse: true,
 });
 
   const clearQuestions = () => {

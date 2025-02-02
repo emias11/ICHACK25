@@ -67,14 +67,14 @@ app.post('/prompts/choices', (req: Request, res: Response) => {
 
 // Handle user answer
 app.post('/answer', (req: Request, res: Response) => {
-    console.log("Setting answer");
   const { questionId, answer } = req.body;
   
-  if (!questionId || !answer) {
+  if (!answer) {
     return res.status(400).json({ message: 'Missing questionId or answer' });
   }
   
   userAnswer = answer;
+  console.log("Setting answer to", answer);
   res.status(200).json({ success: true });
 });
 
