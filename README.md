@@ -1,5 +1,8 @@
 # ICHACK25 - CheetCode
 
+#### Please see `CheetCodeDemo.mp4` for demonstration
+Sorry this didn't work in the live demo! Hard-coded IP changed due to moving to another part of campus, should have hosted on the cloud :(
+
 ![image](https://github.com/user-attachments/assets/c8c6778b-e7a8-4eae-b834-59b7c0298580)
 
 
