@@ -7,6 +7,7 @@ const port = 3001;
 app.use(cors());
 app.use(express.json());
 
+let pendingPromptResponses: Array<{res: Response, questionData: any}> = [];
 let currentTheme: string | null = null;
 let currentQuestion: {
   id: string;
@@ -34,8 +35,12 @@ app.get('/current-question', (req: Request, res: Response) => {
 
 // Python script sends the question
 app.post('/prompts/choices', (req: Request, res: Response) => {
-  const { question, choices } = req.body;
+  pendingPromptResponses.push({
+      res: res,
+      questionData: req.body
+    });
 
+  const { question, choices } = req.body;
   // Generate a unique ID for the question
   const questionId = Math.random().toString(36).substring(7);
 
@@ -62,6 +67,7 @@ app.post('/prompts/choices', (req: Request, res: Response) => {
 
 // Handle user answer
 app.post('/answer', (req: Request, res: Response) => {
+    console.log("Setting answer");
   const { questionId, answer } = req.body;
   
   if (!questionId || !answer) {
@@ -85,7 +91,6 @@ app.get('/result/:questionId', (req: Request, res: Response) => {
 });
 
 // Python script sends the result
-// Python script sends the result
 app.post('/result', (req: Request, res: Response) => {
   const { correct, explanation } = req.body;
 
@@ -107,6 +112,7 @@ app.post('/result', (req: Request, res: Response) => {
 });
 
 // Handle theme selection
+// Around line 190 in server.ts
 app.post('/select_theme', (req: Request, res: Response) => {
   const { theme } = req.body;
   
@@ -115,9 +121,19 @@ app.post('/select_theme', (req: Request, res: Response) => {
   }
   
   currentTheme = theme;
+  currentQuestion = null;
+  userAnswer = null;
+
+  // Send "exit" to any pending requests
+  if (pendingPromptResponses.length > 0) {
+    pendingPromptResponses.forEach(({res}) => {
+      res.json({ answer: 'exit' });
+    });
+    pendingPromptResponses = [];
+  }
+  
   res.status(200).json({ success: true });
 });
-
 app.listen(port, () => {
   console.log(`Express server running on http://localhost:${port}`);
 });

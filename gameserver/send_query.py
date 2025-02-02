@@ -88,7 +88,7 @@ if __name__ == "__main__":
         
         explanation = ""
         is_correct = ""
-        while True: 
+        while True and answer != "exit": 
             # 4. Input the answer received from the user to this bs. 
             response = get_openai_response(answer)
             parsed_response = parse_openai_response(response)
@@ -110,27 +110,9 @@ if __name__ == "__main__":
             # 6. Send the question and choices to /next_question (new function)
             answer = post_next_question(api_url, question, choices)
             if answer == "exit": 
+                print("recieved exit!!!")
                 break 
 
         # 7. Continue looping (the next iteration will fetch another question)
-        time.sleep(2)  # Adjust the sleep time if needed
+        time.sleep(0.5)  # Adjust the sleep time if needed
 
-    
-    # print("Type 'exit' to quit the conversation.")
-
-    # try:
-    #     while True:
-    #         prompt = get_user_input()
-    #         if prompt.lower() == "exit":
-    #             print("Exiting the conversation...")
-    #             break  # Exit the loop if the user types "exit"
-
-    #         response = get_openai_response(prompt)
-    #         print("Response:", response)
-
-    # except KeyboardInterrupt:
-    #     print("\nSession interrupted. Saving conversation...")
-
-    # # Save the conversation after exit or interruption (Ctrl+C)
-    # save_conversation_to_file(generate_filename())
-    # print("Conversation saved to history.")
