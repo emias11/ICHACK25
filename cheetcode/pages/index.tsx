@@ -282,33 +282,44 @@ const QuizApp = () => {
                   {question.question}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {Object.entries(question.choices).map(([key, code]) => (
-                    <div
-                      key={key}
-                      className={`p-4 rounded-lg cursor-pointer ${
-                        !loadingQuestions[question.id] && isAnswered[question.id] && selectedAnswers[question.id] === key
-                          ? results[question.id]?.correct
-                            ? 'bg-green-900'
-                            : 'bg-red-900'
-                          : 'bg-gray-900'
-                      }`}
-                      onClick={() => handleAnswer(question.id, key)}
-                    >
-                    {loadingQuestions[question.id] && selectedAnswers[question.id] === key ? (
-                        <div className="flex justify-center items-center h-full">
-                          <ClipLoader color="#4A90E2" loading={true} size={30} />
-                        </div>
-                      ) : (
-                      <SyntaxHighlighter
-  language="python"
-  style={customDarkTheme}
-  customStyle={{ margin: 0, background: 'transparent', fontSize: '11.5px' }}  // Added fontSize
->
-  {code}
-</SyntaxHighlighter>
-)}
-</div>
-                  ))}
+                  {Object.entries(question.choices).map(([key, code]) => {
+  const [explanation, ...codeLines] = code.split('\n');
+  const cleanCode = codeLines.join('\n').replace(/```/g, '');
+
+  return (
+    <div
+      key={key}
+      className={`p-4 rounded-lg cursor-pointer ${
+        !loadingQuestions[question.id] && isAnswered[question.id] && selectedAnswers[question.id] === key
+          ? results[question.id]?.correct
+            ? 'bg-green-900'
+            : 'bg-red-900'
+          : 'bg-gray-900'
+      }`}
+      onClick={() => handleAnswer(question.id, key)}
+    >
+      {/* Explanation text */}
+      <p className="text-sm text-gray-300 mb-2">{explanation}</p>
+
+      {/* Code block or loading spinner */}
+      <div className="relative min-h-[100px]"> {/* Ensure the container has a minimum height */}
+        {loadingQuestions[question.id] && selectedAnswers[question.id] === key ? (
+          <div className="absolute inset-0 flex justify-center items-center"> {/* Center the spinner */}
+            <ClipLoader color="#4A90E2" loading={true} size={30} />
+          </div>
+        ) : (
+          <SyntaxHighlighter
+            language="python"
+            style={customDarkTheme}
+            customStyle={{ margin: 0, background: 'transparent', fontSize: '11.5px' }}
+          >
+            {cleanCode}
+          </SyntaxHighlighter>
+        )}
+      </div>
+    </div>
+  );
+})}
                 </div>
                 {results[question.id] && (
                   <div className="mt-4 p-4 bg-gray-700 rounded-lg">
