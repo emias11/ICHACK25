@@ -325,7 +325,7 @@ const QuizApp = () => {
           <SyntaxHighlighter
             language="python"
             style={customDarkTheme}
-            customStyle={{ margin: 0, background: 'transparent', fontSize: '11.5px' }}
+            customStyle={{ margin: 0, background: 'transparent', fontSize: '11px' }}
           >
             {cleanCode}
           </SyntaxHighlighter>
