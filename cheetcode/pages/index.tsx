@@ -39,6 +39,7 @@ const QuizApp = () => {
   const [results, setResults] = useState<Record<string, Result>>({});
   const [showTopicMenu, setShowTopicMenu] = useState(false);
   const [loadingQuestions, setLoadingQuestions] = useState<Record<string, boolean>>({});
+  const [correctCount, setCorrectCount] = useState(0);
   const questionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   const sendExitSignal = async () => {
@@ -68,6 +69,7 @@ const QuizApp = () => {
   const handlers = useSwipeable({
   onSwipedLeft: async () => {
     await sendExitSignal().catch((error) => console.error("Failed to send exit signal:", error));
+    setCorrectCount(0);  // reset number of correct questions
 
     // Continue with existing swipe logic
     let i = 1;
@@ -81,6 +83,7 @@ const QuizApp = () => {
   },
   onSwipedRight: async () => {
     await sendExitSignal().catch((error) => console.error("Failed to send exit signal:", error));
+    setCorrectCount(0);
 
     // Continue with existing swipe logic
     let i = 1;
@@ -172,6 +175,7 @@ const QuizApp = () => {
   }, []);
 
   const handleAnswer = async (questionId: string, answer: string) => {
+    console.log("correct count is ", correctCount);
     if (isAnswered[questionId]) return;
     
     setSelectedAnswers((prev) => ({ ...prev, [questionId]: answer }));
@@ -192,6 +196,9 @@ const QuizApp = () => {
       }
       
       await fetchResult(questionId);
+      if (results[questionId]?.correct) {
+        setCorrectCount(prev => prev + 1);
+      }
     } catch (error) {
       console.error('Failed to send answer:', error);
     } finally {
@@ -284,11 +291,18 @@ const QuizApp = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {Object.entries(question.choices).map(([key, code]) => {
   const [explanation, ...codeLines] = code.split('\n');
-  
-  // Check if the first line is just "python" and remove it if so
   const firstLine = codeLines[0]?.trim();
   const isPythonTag = firstLine === 'python' || firstLine === '```python';
   const cleanCode = (isPythonTag ? codeLines.slice(1) : codeLines).join('\n').replace(/```/g, '');
+  const hasCode = cleanCode.trim() && (
+  cleanCode.includes('=') || 
+  cleanCode.includes('def ') || 
+  cleanCode.includes('return') ||
+  cleanCode.includes('{') ||
+  cleanCode.includes('[') ||
+  cleanCode.includes('#') ||
+  cleanCode.includes('(')
+);
 
   return (
     <div
@@ -302,16 +316,13 @@ const QuizApp = () => {
       }`}
       onClick={() => handleAnswer(question.id, key)}
     >
-      {/* Explanation text */}
       <p className="text-sm text-gray-300 mb-2">{explanation}</p>
-
-      {/* Code block or loading spinner */}
-      <div className="relative min-h-[100px]"> {/* Ensure the container has a minimum height */}
+      <div className="relative min-h-[100px]">
         {loadingQuestions[question.id] && selectedAnswers[question.id] === key ? (
-          <div className="absolute inset-0 flex justify-center items-center"> {/* Center the spinner */}
+          <div className="absolute inset-0 flex justify-center items-center">
             <ClipLoader color="#4A90E2" loading={true} size={30} />
           </div>
-        ) : (
+        ) : hasCode ? (
           <SyntaxHighlighter
             language="python"
             style={customDarkTheme}
@@ -319,6 +330,8 @@ const QuizApp = () => {
           >
             {cleanCode}
           </SyntaxHighlighter>
+        ) : (
+          <p className="text-sm text-gray-300">{cleanCode}</p>
         )}
       </div>
     </div>
@@ -343,7 +356,7 @@ const QuizApp = () => {
         </div>
 
         {/* Quiz Completion - Move this outside of the questions map */}
-        {Object.values(results).some(result => result.explanation === "COMPLETED") && (
+        {correctCount >= 5 && (
           <Card className="mt-6 bg-gray-800 border-gray-700">
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold text-center text-gray-100">

@@ -25,7 +25,7 @@ def get_openai_response(prompt):
         message_history.append({"role": "user", "content": prompt})
         # Use the new `openai.ChatCompletion.create()` method for GPT models
         response = client.chat.completions.create(model="gpt-4o",  # You can change this to the latest model if needed
-        messages=message_history
+        messages=message_history,
         )
         
         assistant_reply = response.choices[0].message.content
@@ -105,19 +105,18 @@ if __name__ == "__main__":
                 try: 
                     explanation = parsed_response["explanation"] 
                     is_correct = parsed_response["correct"]
-                    if explanation == 'COMPLETED':
-                        break
-                    question_for_user = parsed_response["question"]
-                    choices = parsed_response["choices"]
                     break
                 except KeyError:
                     response = get_openai_response(answer)
                     parsed_response = parse_openai_response(response)
+
+            try:
+                question_for_user = parsed_response["question"]
+                choices = parsed_response["choices"]
+            except KeyError:
+                continue
                 
             post_result(api_url, is_correct, explanation)
-            
-            if explanation == 'COMPLETED':
-                break
 
             # 6. Send the question and choices to /next_question (new function)
             
