@@ -41,6 +41,7 @@ app.post('/prompts/choices', (req: Request, res: Response) => {
     });
 
   const { question, choices } = req.body;
+  console.log("Received new question at choices endpoint!");
   // Generate a unique ID for the question
   const questionId = Math.random().toString(36).substring(7);
 
@@ -51,13 +52,17 @@ app.post('/prompts/choices', (req: Request, res: Response) => {
     choices,
   };
 
+  userAnswer = null;
+
   // Wait for the user to answer (long-polling)
   const waitForAnswer = async () => {
     while (userAnswer === null) {
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Poll every second
+      // console.log("spinning wait for answer is null...")
+      await new Promise((resolve) => setTimeout(resolve, 100)); // Poll 10 times a second
     }
 
     // Send the question ID back to the Python script
+    console.log("Sending answer to user: ", userAnswer);
     res.status(200).json({ answer: userAnswer });
 
   };
@@ -68,15 +73,13 @@ app.post('/prompts/choices', (req: Request, res: Response) => {
 // Handle user answer
 app.post('/answer', (req: Request, res: Response) => {
   const { questionId, answer } = req.body;
-  
-  console.log(pendingPromptResponses);
 
   if (!answer) {
     return res.status(400).json({ message: 'Missing questionId or answer' });
   }
   
   userAnswer = answer;
-  console.log("Setting answer to", answer);
+  console.log("setting answer variable to : ", answer);
   res.status(200).json({ success: true });
 });
 
@@ -109,6 +112,7 @@ app.post('/result', (req: Request, res: Response) => {
   }
 
   // Reset for the next question
+  console.log("Resetting user answer to null");
   userAnswer = null;
   currentQuestion = null;
 });
@@ -122,17 +126,25 @@ app.post('/select_theme', (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Missing theme' });
   }
   
+    
+  // const smallDelay = async () => {
+    // await new Promise(resolve => setTimeout(resolve, 1000));
+  // }
+
+  // console.log("Resetting user answer to null after 1 second...");
+  // smallDelay()
   currentTheme = theme;
   currentQuestion = null;
-  userAnswer = null;
+  // userAnswer = null;
 
   // Send "exit" to any pending requests
-  if (pendingPromptResponses.length > 0) {
-    pendingPromptResponses.forEach(({res}) => {
-      res.json({ answer: 'exit' });
-    });
-    pendingPromptResponses = [];
-  }
+  // if (pendingPromptResponses.length > 0) {
+    // pendingPromptResponses.forEach(({res}) => {
+      // console.log("Replying exit during auxiliary loop!");
+      // res.json({ answer: 'exit' });
+    // });
+    // pendingPromptResponses = [];
+  // }
   
   res.status(200).json({ success: true });
 });

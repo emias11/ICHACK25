@@ -84,11 +84,16 @@ if __name__ == "__main__":
                 parsed_response = parse_openai_response(response)
         
         # 3. Send the question, problem statement, and choices to /prompts/choices and wait for an answer
-        answer = post_initial_data(api_url, question_for_user, problem_statement, choices)
-        
         explanation = ""
         is_correct = ""
-        while True and answer != "exit": 
+
+        while True: 
+
+            answer = post_next_question(api_url, question_for_user, choices)
+            if answer == "exit": 
+                print("recieved exit!!!")
+                break 
+
             # 4. Input the answer received from the user to this bs. 
             response = get_openai_response(answer)
             parsed_response = parse_openai_response(response)
@@ -98,7 +103,7 @@ if __name__ == "__main__":
                 try: 
                     explanation = parsed_response["explanation"] 
                     is_correct = parsed_response["correct"]
-                    question = parsed_response["question"]
+                    question_for_user = parsed_response["question"]
                     choices = parsed_response["choices"]
                     break
                 except KeyError:
@@ -108,11 +113,7 @@ if __name__ == "__main__":
             post_result(api_url, is_correct, explanation)
             
             # 6. Send the question and choices to /next_question (new function)
-            answer = post_next_question(api_url, question, choices)
-            if answer == "exit": 
-                print("recieved exit!!!")
-                break 
-
+            
         # 7. Continue looping (the next iteration will fetch another question)
         time.sleep(0.5)  # Adjust the sleep time if needed
 
