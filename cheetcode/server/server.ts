@@ -53,11 +53,8 @@ app.post('/prompts/choices', (req: Request, res: Response) => {
     }
 
     // Send the question ID back to the Python script
-    res.status(200).json({ questionId });
+    res.status(200).json({ answer: userAnswer });
 
-    // Reset for the next question
-    userAnswer = null;
-    currentQuestion = null;
   };
 
   waitForAnswer();
@@ -88,15 +85,25 @@ app.get('/result/:questionId', (req: Request, res: Response) => {
 });
 
 // Python script sends the result
+// Python script sends the result
 app.post('/result', (req: Request, res: Response) => {
-  const { questionId, correct, explanation } = req.body;
-  
-  if (!questionId || correct === undefined || !explanation) {
-    return res.status(400).json({ message: 'Missing questionId, correct, or explanation' });
+  const { correct, explanation } = req.body;
+
+  if (correct === undefined || !explanation) {
+    return res.status(400).json({ message: 'Missing correct or explanation' });
   }
-  
-  results[questionId] = { correct, explanation };
-  res.status(200).json({ success: true });
+
+  // Store the result for the most recent question
+  if (currentQuestion) {
+    results[currentQuestion.id] = { correct, explanation };
+    res.status(200).json({ success: true });
+  } else {
+    res.status(404).json({ message: 'No current question found' });
+  }
+
+  // Reset for the next question
+  userAnswer = null;
+  currentQuestion = null;
 });
 
 // Handle theme selection

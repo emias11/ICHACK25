@@ -142,30 +142,30 @@ const QuizApp = () => {
   };
 
   const fetchResult = async (questionId: string) => {
-    let attempts = 0;
-    const maxAttempts = 30;
+  let attempts = 0;
+  const maxAttempts = 30;
 
-    const pollResult = async () => {
-      try {
-        const response = await fetch(`http://localhost:3001/result/${questionId}`);
-        if (response.ok) {
-          const data = await response.json();
-          setResults((prev) => ({ ...prev, [questionId]: data }));
-          return true;
-        }
-        return false;
-      } catch (error) {
-        console.log('Waiting for result...');
-        return false;
+  const pollResult = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/result/${questionId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setResults((prev) => ({ ...prev, [questionId]: data }));
+        return true;
       }
-    };
-
-    while (attempts < maxAttempts) {
-      const resultReceived = await pollResult();
-      if (resultReceived) break;
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      attempts++;
+      return false;
+    } catch (error) {
+      console.log('Waiting for result...');
+      return false;
     }
+  };
+
+  while (attempts < maxAttempts) {
+    const resultReceived = await pollResult();
+    if (resultReceived) break;
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    attempts++;
+  }
   };
 
   return (
@@ -222,15 +222,15 @@ const QuizApp = () => {
               </div>
 
               {results[question.id] && (
-                <div className="mt-4 p-4 bg-gray-700 rounded-lg">
-                  <p className="text-sm">
-                    <span className={`font-semibold ${results[question.id].correct ? 'text-green-400' : 'text-red-400'}`}>
-                      {results[question.id].correct ? 'Correct! ' : 'Incorrect. '}
-                    </span>
-                    {results[question.id].explanation}
-                  </p>
-                </div>
-              )}
+              <div className="mt-4 p-4 bg-gray-700 rounded-lg">
+            <p className="text-sm">
+              <span className={`font-semibold ${results[question.id].correct ? 'text-green-400' : 'text-red-400'}`}>
+                {results[question.id].correct ? 'Correct! ' : 'Incorrect. '}
+              </span>
+              {results[question.id].explanation}
+                </p>
+              </div>
+            )}
             </CardContent>
           </Card>
         ))}

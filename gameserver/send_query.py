@@ -70,6 +70,8 @@ if __name__ == "__main__":
         parsed_response = parse_openai_response(response)
         print(parsed_response)
         
+        ##  CHATGPT SOMETIMES BREAKS
+
         # 2. Define a problem statement and choices (this would typically come from OpenAI or other logic)
         problem_statement = parsed_response["problem_statement"] 
         choices = parsed_response["choices"]
