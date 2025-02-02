@@ -284,7 +284,11 @@ const QuizApp = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {Object.entries(question.choices).map(([key, code]) => {
   const [explanation, ...codeLines] = code.split('\n');
-  const cleanCode = codeLines.join('\n').replace(/```/g, '');
+  
+  // Check if the first line is just "python" and remove it if so
+  const firstLine = codeLines[0]?.trim();
+  const isPythonTag = firstLine === 'python' || firstLine === '```python';
+  const cleanCode = (isPythonTag ? codeLines.slice(1) : codeLines).join('\n').replace(/```/g, '');
 
   return (
     <div
