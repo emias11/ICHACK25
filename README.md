@@ -22,3 +22,13 @@ Install `requests`, preferrably using a venv:
 ```bash
 pip install requests
 ```
+___
+
+# Running the Program
+
+1. Set your local IP address in both `gameserver/send_query.py` and `cheetcode/pages/index.tsx`
+2. Run `npm run dev -- -H 0.0.0.0` from `cheetcode/`
+3. Run `python3 send_query.py` from `gameserver/`
+
+
+Note that due to a bug with the ChatGPT API that we didn't figure out, you will need to keep re-running the `send_query` file until it says `Sending POST request`. Occasionally ChatGPT returns a string that cannot be parsed for some reason. 
