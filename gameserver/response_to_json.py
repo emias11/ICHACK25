@@ -40,7 +40,6 @@ def parse_openai_response(response_text):
         for choice_letter, description in choices:
             choices_dict[choice_letter] = description.strip()
         result["choices"] = choices_dict
-
     return result
 
 # Example OpenAI response (formatted as plain text)

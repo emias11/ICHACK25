@@ -122,4 +122,3 @@ if __name__ == "__main__":
             
         # 7. Continue looping (the next iteration will fetch another question)
         time.sleep(0.5)  # Adjust the sleep time if needed
-

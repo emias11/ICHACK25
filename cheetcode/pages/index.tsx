@@ -7,7 +7,6 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { ClipLoader } from 'react-spinners';
 
-
 const IP_ADDRESS = "172.26.251.48"
 
 const customDarkTheme = {
