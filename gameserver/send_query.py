@@ -4,6 +4,8 @@ from datetime import datetime
 from api_calls import *
 from response_to_json import *
 
+IP_ADDRESS = "172.26.251.48"
+
 client = OpenAI(api_key="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")
 
 def load_system_message(file_path):
@@ -60,7 +62,7 @@ def get_user_input():
 
 if __name__ == "__main__":
     
-    api_url = "http://localhost:3001/"
+    api_url = f"http://{IP_ADDRESS}:3001/"
     while True: 
         # 1. Get the question from /leetcode_question. E.g. Same Tree
         question = get_leetcode_question(api_url)

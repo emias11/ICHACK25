@@ -8,7 +8,7 @@ import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { ClipLoader } from 'react-spinners';
 
 
-const IP_ADDRESS = "172.26.251.48"
+const IP_ADDRESS = "localhost"
 
 const customDarkTheme = {
   ...dark,
@@ -200,31 +200,30 @@ const QuizApp = () => {
   };
 
   const fetchResult = async (questionId: string) => {
-    let attempts = 0;
-    const maxAttempts = 30;
-
-    const pollResult = async () => {
-      try {
-        const response = await fetch('http://' + IP_ADDRESS + ':3001/result/${questionId}');
-        if (response.ok) {
-          const data = await response.json();
-          setResults((prev) => ({ ...prev, [questionId]: data }));
-          return true;
-        }
-        return false;
-      } catch (error) {
-        console.log('Waiting for result...');
-        return false;
+  let attempts = 0;
+  const maxAttempts = 50; // Increased from 30
+  
+  const pollResult = async () => {
+    try {
+      const response = await fetch(`http://${IP_ADDRESS}:3001/result/${questionId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setResults((prev) => ({ ...prev, [questionId]: data }));
+        return true;
       }
-    };
-
-    while (attempts < maxAttempts) {
-      const resultReceived = await pollResult();
-      if (resultReceived) break;
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      attempts++;
+      return false;
+    } catch (error) {
+      return false;
     }
   };
+
+  while (attempts < maxAttempts) {
+    const resultReceived = await pollResult();
+    if (resultReceived) break;
+    await new Promise(resolve => setTimeout(resolve, 500)); // Increased from 100ms to 500ms
+    attempts++;
+  }
+};
 
   // Helper function to replace backticks with <code> tags
     const renderInlineCode = (text) => {
@@ -283,44 +282,33 @@ const QuizApp = () => {
                   {question.question}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {Object.entries(question.choices).map(([key, code]) => {
-  const [explanation, ...codeLines] = code.split('\n');
-  const cleanCode = codeLines.join('\n').replace(/```/g, '');
-
-  return (
-    <div
-      key={key}
-      className={`p-4 rounded-lg cursor-pointer ${
-        !loadingQuestions[question.id] && isAnswered[question.id] && selectedAnswers[question.id] === key
-          ? results[question.id]?.correct
-            ? 'bg-green-900'
-            : 'bg-red-900'
-          : 'bg-gray-900'
-      }`}
-      onClick={() => handleAnswer(question.id, key)}
-    >
-      {/* Explanation text */}
-      <p className="text-sm text-gray-300 mb-2">{explanation}</p>
-
-      {/* Code block or loading spinner */}
-      <div className="relative min-h-[100px]"> {/* Ensure the container has a minimum height */}
-        {loadingQuestions[question.id] && selectedAnswers[question.id] === key ? (
-          <div className="absolute inset-0 flex justify-center items-center"> {/* Center the spinner */}
-            <ClipLoader color="#4A90E2" loading={true} size={30} />
-          </div>
-        ) : (
-          <SyntaxHighlighter
-            language="python"
-            style={customDarkTheme}
-            customStyle={{ margin: 0, background: 'transparent', fontSize: '11.5px' }}
-          >
-            {cleanCode}
-          </SyntaxHighlighter>
-        )}
-      </div>
-    </div>
-  );
-})}
+                  {Object.entries(question.choices).map(([key, code]) => (
+                    <div
+                      key={key}
+                      className={`p-4 rounded-lg cursor-pointer ${
+                        !loadingQuestions[question.id] && isAnswered[question.id] && selectedAnswers[question.id] === key
+                          ? results[question.id]?.correct
+                            ? 'bg-green-900'
+                            : 'bg-red-900'
+                          : 'bg-gray-900'
+                      }`}
+                      onClick={() => handleAnswer(question.id, key)}
+                    >
+                    {loadingQuestions[question.id] && selectedAnswers[question.id] === key ? (
+                        <div className="flex justify-center items-center h-full">
+                          <ClipLoader color="#4A90E2" loading={true} size={30} />
+                        </div>
+                      ) : (
+                      <SyntaxHighlighter
+  language="python"
+  style={customDarkTheme}
+  customStyle={{ margin: 0, background: 'transparent', fontSize: '11.5px' }}  // Added fontSize
+>
+  {code}
+</SyntaxHighlighter>
+)}
+</div>
+                  ))}
                 </div>
                 {results[question.id] && (
                   <div className="mt-4 p-4 bg-gray-700 rounded-lg">

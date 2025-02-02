@@ -85,6 +85,7 @@ app.post('/answer', (req: Request, res: Response) => {
 
 // Get result for a specific question
 app.get('/result/:questionId', (req: Request, res: Response) => {
+  console.log("probing result...");
   const { questionId } = req.params;
   const result = results[questionId];
   
@@ -98,6 +99,8 @@ app.get('/result/:questionId', (req: Request, res: Response) => {
 // Python script sends the result
 app.post('/result', (req: Request, res: Response) => {
   const { correct, explanation } = req.body;
+
+  console.log("Received result!")
 
   if (correct === undefined || !explanation) {
     return res.status(400).json({ message: 'Missing correct or explanation' });
