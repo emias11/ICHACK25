@@ -15,5 +15,10 @@ npm install -D @shadcn/ui
 ```
 Install express
 ```bash
-npm install express node-fetch @types/express
+npm install express node-fetch @types/express 
+npm install concurrently --save-dev
+```
+Install `requests`, preferrably using a venv:
+```bash
+pip install requests
 ```

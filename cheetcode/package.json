@@ -2,8 +2,9 @@
   "name": "cheetcode",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "concurrently \"tsx ./server/server.ts\" \"next dev --turbopack\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -13,14 +14,18 @@
     "@types/express": "^5.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cors": "^2.8.5",
     "express": "^4.21.2",
     "lucide-react": "^0.474.0",
     "next": "15.1.6",
     "node-fetch": "^3.3.2",
     "react-dom": "^19.0.0",
+    "react-spinners": "^0.15.0",
     "react-swipeable": "^7.0.2",
     "react-syntax-highlighter": "^15.6.1",
-    "tailwind-merge": "^3.0.1"
+    "syntax-highlighter": "^0.0.3",
+    "tailwind-merge": "^3.0.1",
+    "tsx": "^4.19.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -28,11 +33,13 @@
     "@types/node": "^20",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19",
+    "concurrently": "^8.2.2",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
     "postcss": "^8",
     "react": "^19.0.0",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
   }
 }

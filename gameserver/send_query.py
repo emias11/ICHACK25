@@ -4,6 +4,8 @@ from datetime import datetime
 from api_calls import *
 from response_to_json import *
 
+IP_ADDRESS = "172.26.251.48"
+
 client = OpenAI(api_key="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")
 
 def load_system_message(file_path):
@@ -23,7 +25,7 @@ def get_openai_response(prompt):
         message_history.append({"role": "user", "content": prompt})
         # Use the new `openai.ChatCompletion.create()` method for GPT models
         response = client.chat.completions.create(model="gpt-4o",  # You can change this to the latest model if needed
-        messages=message_history
+        messages=message_history,
         )
         
         assistant_reply = response.choices[0].message.content
@@ -60,15 +62,18 @@ def get_user_input():
 
 if __name__ == "__main__":
     
-    api_url = "http://localhost:3001/"
+    api_url = f"http://{IP_ADDRESS}:3001/"
     while True: 
-        # 1. Get the question from /leetcode. E.g. Same Tree
+        # 1. Get the question from /leetcode_question. E.g. Same Tree
         question = get_leetcode_question(api_url)
         
         print("User input")
         response = get_openai_response(question)
         parsed_response = parse_openai_response(response)
+        print(parsed_response)
         
+        ##  CHATGPT SOMETIMES BREAKS
+
         # 2. Define a problem statement and choices (this would typically come from OpenAI or other logic)
         while True:
             try:
@@ -81,11 +86,16 @@ if __name__ == "__main__":
                 parsed_response = parse_openai_response(response)
         
         # 3. Send the question, problem statement, and choices to /prompts/choices and wait for an answer
-        answer = post_initial_data(api_url, question_for_user, problem_statement, choices)
-        
         explanation = ""
         is_correct = ""
+
         while True: 
+
+            answer = post_next_question(api_url, question_for_user, choices)
+            if answer == "exit": 
+                print("recieved exit!!!")
+                break 
+
             # 4. Input the answer received from the user to this bs. 
             response = get_openai_response(answer)
             parsed_response = parse_openai_response(response)
@@ -95,39 +105,20 @@ if __name__ == "__main__":
                 try: 
                     explanation = parsed_response["explanation"] 
                     is_correct = parsed_response["correct"]
-                    question = parsed_response["question"]
-                    choices = parsed_response["choices"]
                     break
                 except KeyError:
                     response = get_openai_response(answer)
                     parsed_response = parse_openai_response(response)
+
+            try:
+                question_for_user = parsed_response["question"]
+                choices = parsed_response["choices"]
+            except KeyError:
+                continue
                 
             post_result(api_url, is_correct, explanation)
-            
+
             # 6. Send the question and choices to /next_question (new function)
-            answer = post_next_question(api_url, question, choices)
-            if answer == "exit": 
-                break 
-
+            
         # 7. Continue looping (the next iteration will fetch another question)
-        time.sleep(2)  # Adjust the sleep time if needed
-
-    
-    # print("Type 'exit' to quit the conversation.")
-
-    # try:
-    #     while True:
-    #         prompt = get_user_input()
-    #         if prompt.lower() == "exit":
-    #             print("Exiting the conversation...")
-    #             break  # Exit the loop if the user types "exit"
-
-    #         response = get_openai_response(prompt)
-    #         print("Response:", response)
-
-    # except KeyboardInterrupt:
-    #     print("\nSession interrupted. Saving conversation...")
-
-    # # Save the conversation after exit or interruption (Ctrl+C)
-    # save_conversation_to_file(generate_filename())
-    # print("Conversation saved to history.")
+        time.sleep(0.5)  # Adjust the sleep time if needed

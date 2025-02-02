@@ -6,7 +6,7 @@ def get_leetcode_question(api_url, timeout_seconds=600):
         try:
             # Sending GET request to /leetcode
             print("Sending GET request to /leetcode...")
-            response = requests.get(f"{api_url}/leetcode", timeout=timeout_seconds)  # 10-minute timeout
+            response = requests.get(f"{api_url}/leetcode_question", timeout=timeout_seconds)  # 10-minute timeout
 
             if response.status_code == 200:
                 data = response.json()
@@ -18,7 +18,7 @@ def get_leetcode_question(api_url, timeout_seconds=600):
                     return question  # Return question if received
 
             else:
-                print(f"Error: Failed to retrieve data from /leetcode (status code {response.status_code})")
+                print(f"Error: Failed to retrieve data from /leetcode_question (status code {response.status_code})")
             
         except requests.exceptions.Timeout:
             print("Request timed out. Retrying...")
@@ -67,13 +67,13 @@ def post_next_question(api_url, question, choices, timeout_seconds=600):
     while True:
         try:
             # Send POST request to /next_question with question and choices
-            print("Sending POST request to /next_question...")
+            print("Sending POST request to /prompts/choices...")
             payload = {
                 "question": question,
                 "choices": choices
             }
 
-            response = requests.post(f"{api_url}/next_question", json=payload, timeout=timeout_seconds)
+            response = requests.post(f"{api_url}/prompts/choices", json=payload, timeout=timeout_seconds)
 
             if response.status_code == 200:
                 data = response.json()
@@ -85,7 +85,7 @@ def post_next_question(api_url, question, choices, timeout_seconds=600):
                     return answer  # Return the answer
 
             else:
-                print(f"Error: Failed to retrieve data from /next_question (status code {response.status_code})")
+                print(f"Error: Failed to retrieve data from /prompts/choices (status code {response.status_code})")
 
         except requests.exceptions.Timeout:
             print("Request timed out. Retrying...")
