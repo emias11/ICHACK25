@@ -5,6 +5,8 @@ import { Code, Filter } from 'lucide-react';
 import { problems, all_topics } from '@/data/questions';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { ClipLoader } from 'react-spinners';
+
 
 const customDarkTheme = {
   ...dark,
@@ -34,6 +36,7 @@ const QuizApp = () => {
   const [isAnswered, setIsAnswered] = useState<Record<string, boolean>>({});
   const [results, setResults] = useState<Record<string, Result>>({});
   const [showTopicMenu, setShowTopicMenu] = useState(false);
+  const [loadingQuestions, setLoadingQuestions] = useState<Record<string, boolean>>({});
   const questionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   const sendExitSignal = async () => {
@@ -161,6 +164,7 @@ const QuizApp = () => {
     
     setSelectedAnswers((prev) => ({ ...prev, [questionId]: answer }));
     setIsAnswered((prev) => ({ ...prev, [questionId]: true }));
+    setLoadingQuestions((prev) => ({ ...prev, [questionId]: true }));
     
     try {
       const response = await fetch('http://localhost:3001/answer', {
@@ -178,6 +182,8 @@ const QuizApp = () => {
       await fetchResult(questionId);
     } catch (error) {
       console.error('Failed to send answer:', error);
+    } finally {
+      setLoadingQuestions((prev) => ({ ...prev, [questionId]: false })); // Set loading to false for the question
     }
   };
 
@@ -264,7 +270,7 @@ const QuizApp = () => {
                     <div
                       key={key}
                       className={`p-4 rounded-lg cursor-pointer ${
-                        isAnswered[question.id] && selectedAnswers[question.id] === key
+                        !loadingQuestions[question.id] && isAnswered[question.id] && selectedAnswers[question.id] === key
                           ? results[question.id]?.correct
                             ? 'bg-green-900'
                             : 'bg-red-900'
@@ -272,6 +278,11 @@ const QuizApp = () => {
                       }`}
                       onClick={() => handleAnswer(question.id, key)}
                     >
+                    {loadingQuestions[question.id] && selectedAnswers[question.id] === key ? (
+                        <div className="flex justify-center items-center h-full">
+                          <ClipLoader color="#4A90E2" loading={true} size={30} />
+                        </div>
+                      ) : (
                       <SyntaxHighlighter
   language="python"
   style={customDarkTheme}
@@ -279,7 +290,7 @@ const QuizApp = () => {
 >
   {code}
 </SyntaxHighlighter>
-
+)}
 </div>
                   ))}
                 </div>

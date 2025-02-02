@@ -69,6 +69,8 @@ app.post('/prompts/choices', (req: Request, res: Response) => {
 app.post('/answer', (req: Request, res: Response) => {
   const { questionId, answer } = req.body;
   
+  console.log(pendingPromptResponses);
+
   if (!answer) {
     return res.status(400).json({ message: 'Missing questionId or answer' });
   }
@@ -115,7 +117,7 @@ app.post('/result', (req: Request, res: Response) => {
 // Around line 190 in server.ts
 app.post('/select_theme', (req: Request, res: Response) => {
   const { theme } = req.body;
-  
+
   if (!theme) {
     return res.status(400).json({ message: 'Missing theme' });
   }
